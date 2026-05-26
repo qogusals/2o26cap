@@ -1,638 +1,1136 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>패스패스 | 일본 소도시 교통비 비교</title>
-<meta name="description" content="여행 동선을 입력하면 교통패스와 일반 결제의 예상 비용을 비교하는 패스패스 프로토타입">
-<style>
-:root{
-  --blue:#316BC8;
-  --blue-dark:#18499D;
-  --blue-soft:#E9F1FF;
-  --sky:#D9ECFF;
-  --orange:#FA9A46;
-  --orange-soft:#FFF3E6;
-  --green:#13A085;
-  --green-soft:#E4FAF4;
-  --ink:#202B45;
-  --muted:#64748B;
-  --line:#DFE7F3;
-  --white:#FFFFFF;
-  --bg:#F7FAFF;
-  --shadow:0 16px 42px rgba(34,69,126,.10);
-  --radius-lg:32px;
-  --radius:22px;
-  --radius-sm:14px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  color:var(--ink);
-  font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  word-break:keep-all;
-}
-a{text-decoration:none;color:inherit}
-button,input,select{font:inherit}
-button{border:0;cursor:pointer}
-.container{width:min(1180px,calc(100% - 44px));margin:auto}
-header{
-  height:72px;position:sticky;top:0;z-index:30;
-  background:rgba(247,250,255,.90);backdrop-filter:blur(14px);
-  border-bottom:1px solid rgba(223,231,243,.85)
-}
-.nav{height:100%;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px;font-size:25px;font-weight:900;color:var(--blue);letter-spacing:-1.2px}
-.logo-mark{
-  width:38px;height:38px;border-radius:12px;background:var(--blue);
-  color:#fff;display:grid;place-items:center;font-size:20px
-}
-.menu{display:flex;align-items:center;gap:34px;color:#4B5C79;font-weight:700;font-size:15px}
-.menu a:hover{color:var(--blue)}
-.small-cta{
-  color:#fff;background:var(--blue);padding:12px 19px;border-radius:13px;
-  transition:.2s
-}
-.small-cta:hover{background:var(--blue-dark)}
-.hero{
-  display:grid;grid-template-columns:1.02fr .98fr;gap:50px;
-  align-items:center;padding:66px 0 72px
-}
-.badge{
-  display:inline-flex;align-items:center;gap:7px;padding:9px 14px;
-  color:var(--blue-dark);background:var(--blue-soft);font-size:14px;
-  font-weight:800;border-radius:999px;margin-bottom:20px
-}
-.hero h1{
-  margin:0 0 18px;font-size:clamp(42px,4.5vw,57px);line-height:1.14;
-  letter-spacing:-3px
-}
-.hero h1 span{color:var(--blue)}
-.hero p{
-  margin:0 0 32px;color:var(--muted);font-size:18px;
-  line-height:1.72;letter-spacing:-.2px
-}
-.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.btn{
-  display:inline-flex;gap:8px;align-items:center;justify-content:center;
-  min-height:54px;padding:0 24px;border-radius:15px;font-weight:800;
-  transition:transform .16s,background .2s,box-shadow .2s
-}
-.btn:hover{transform:translateY(-2px)}
-.btn-primary{color:#fff;background:var(--blue);box-shadow:0 13px 25px rgba(49,107,200,.24)}
-.btn-secondary{color:var(--blue);background:#fff;border:1px solid #D8E5FA}
-.hero-note{display:flex;align-items:center;gap:9px;color:#687892;font-size:14px;font-weight:700;margin-top:25px}
-.check{width:19px;height:19px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-size:12px}
-.visual{
-  position:relative;background:#fff;border:1px solid var(--line);
-  border-radius:36px;padding:16px;box-shadow:var(--shadow)
-}
-.illustration{
-  height:448px;border-radius:25px;overflow:hidden;
-  background:linear-gradient(180deg,#DCEEFF 0%,#EFF6FD 61%,#F9EADB 61%,#F2DFCA 100%);
-  position:relative
-}
-.ill-top{
-  position:absolute;left:20px;right:20px;top:18px;display:flex;
-  align-items:center;justify-content:space-between;z-index:3
-}
-.ill-label{
-  background:#fff;padding:10px 14px;border-radius:13px;font-size:13px;
-  font-weight:800;color:var(--blue-dark);box-shadow:0 7px 18px rgba(20,53,100,.08)
-}
-.ill-price{
-  background:var(--orange-soft);color:#A9550D;padding:10px 13px;
-  border-radius:13px;font-size:13px;font-weight:900
-}
-.screen-card{
-  position:absolute;right:26px;top:90px;width:210px;height:158px;background:#fff;
-  border-radius:16px;box-shadow:0 12px 25px rgba(23,45,79,.12);padding:14px;z-index:2
-}
-.screen-head{height:11px;background:#DCE9FF;border-radius:20px;width:50%;margin-bottom:12px}
-.map-mini{height:78px;background:#F1F7FF;border-radius:10px;position:relative;overflow:hidden}
-.map-mini:before{
-  content:"";position:absolute;width:100px;height:54px;left:40px;top:10px;
-  border-left:3px solid var(--blue);border-bottom:3px solid var(--blue);
-  border-radius:0 0 0 24px;transform:skew(13deg)
-}
-.point{width:9px;height:9px;background:var(--orange);position:absolute;border-radius:50%}
-.p1{left:39px;top:13px}.p2{left:133px;top:55px}
-.mini-bar{height:9px;width:79%;background:#EDF2F8;margin-top:12px;border-radius:10px}
-.woman{
-  position:absolute;left:72px;bottom:57px;width:146px;height:229px;z-index:2
-}
-.hair{
-  position:absolute;left:26px;top:2px;width:88px;height:92px;background:#202D48;
-  border-radius:54px 54px 28px 28px
-}
-.face{
-  position:absolute;left:41px;top:28px;width:58px;height:60px;background:#FFDCC7;
-  border-radius:44% 45% 47% 48%;z-index:1
-}
-.eye{position:absolute;top:25px;width:5px;height:5px;border-radius:50%;background:#24324D}
-.e1{left:16px}.e2{right:16px}
-.mouth{position:absolute;left:26px;top:41px;width:10px;height:7px;border-bottom:2px solid #B56862;border-radius:50%}
-.body{
-  position:absolute;left:21px;top:80px;width:101px;height:125px;
-  border-radius:26px 27px 12px 12px;background:#3B7EDC
-}
-.arm-left,.arm-right{
-  position:absolute;top:96px;width:21px;height:91px;background:#3B7EDC;border-radius:14px;
-}
-.arm-left{left:9px;transform:rotate(23deg)}
-.arm-right{right:10px;transform:rotate(-35deg)}
-.hand{position:absolute;width:18px;height:18px;border-radius:50%;background:#FFDCC7;bottom:-5px}
-.question{
-  position:absolute;left:54px;top:91px;font-size:40px;color:var(--orange);font-weight:900;
-  transform:rotate(-8deg)
-}
-.desk{
-  position:absolute;bottom:44px;left:18px;right:18px;height:20px;border-radius:10px;
-  background:#C48752;z-index:4
-}
-.paper{
-  position:absolute;bottom:65px;left:240px;background:#fff;color:var(--blue);
-  font-size:11px;font-weight:900;padding:15px 22px;border-radius:6px;
-  transform:rotate(4deg);z-index:3;box-shadow:0 3px 8px rgba(0,0,0,.08)
-}
-.ticket{
-  position:absolute;bottom:73px;left:31px;width:67px;height:40px;
-  background:#fff;border-radius:6px;transform:rotate(-6deg);z-index:4;
-  color:var(--orange);font-size:10px;font-weight:900;display:grid;place-items:center
-}
-.stat-row{
-  position:absolute;left:22px;right:22px;bottom:16px;z-index:5;display:grid;
-  grid-template-columns:1fr 1fr;gap:10px
-}
-.visual-stat{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 4px 14px rgba(25,45,85,.06)}
-.visual-stat small{display:block;color:var(--muted);font-size:11px;font-weight:700}
-.visual-stat strong{font-size:17px;color:var(--ink);display:block;margin-top:4px}
-.visual-stat.best{background:#E7FAF4}.visual-stat.best strong{color:var(--green)}
-.section{padding:76px 0}
-.section-head{text-align:center;max-width:720px;margin:0 auto 43px}
-.section-head h2{font-size:38px;letter-spacing:-2px;margin:0 0 13px}
-.section-head p{margin:0;color:var(--muted);font-size:17px;line-height:1.65}
-.problem{background:#fff}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.card{
-  border:1px solid var(--line);background:#fff;border-radius:var(--radius);
-  padding:28px;min-height:202px;transition:.18s
-}
-.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.icon{
-  height:48px;width:48px;border-radius:15px;background:var(--blue-soft);
-  display:grid;place-items:center;font-size:25px;margin-bottom:19px
-}
-.card h3{font-size:20px;letter-spacing:-.7px;margin:0 0 10px}
-.card p{margin:0;color:var(--muted);line-height:1.7;font-size:15px}
-.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
-.flow-grid:before{
-  content:"";height:2px;position:absolute;left:12%;right:12%;top:39px;background:#DBE7FA;z-index:0
-}
-.step{position:relative;z-index:1;text-align:center;padding:0 13px}
-.step-number{
-  margin:0 auto 20px;width:78px;height:78px;border-radius:25px;background:#fff;
-  border:1px solid #D9E6F8;display:grid;place-items:center;color:var(--blue);
-  font-weight:900;font-size:22px;box-shadow:0 8px 20px rgba(43,76,130,.07)
-}
-.step h3{font-size:18px;margin:0 0 8px}
-.step p{color:var(--muted);font-size:14px;line-height:1.65;margin:0}
-.planner{background:#EFF5FF}
-.app{
-  display:grid;grid-template-columns:425px 1fr;gap:19px;align-items:start
-}
-.panel{
-  background:#fff;border:1px solid var(--line);border-radius:28px;
-  padding:25px;box-shadow:0 8px 23px rgba(34,69,126,.05)
-}
-.panel-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.panel-title h3{font-size:22px;letter-spacing:-.7px;margin:0}
-.demo-tag{
-  padding:7px 10px;border-radius:10px;background:var(--orange-soft);
-  color:#9A500E;font-size:12px;font-weight:800
-}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-label{display:block;color:#394864;font-size:14px;font-weight:800;margin:15px 0 8px}
-input,select{
-  width:100%;height:49px;padding:0 13px;background:#fff;border:1px solid #D4E0F2;
-  border-radius:12px;color:var(--ink);outline:none
-}
-input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(49,107,200,.12)}
-.routes{margin-top:17px}
-.routes-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
-.routes-head strong{font-size:14px}
-.text-button{background:none;color:var(--blue);font-weight:800;font-size:13px;padding:4px}
-.segment{
-  display:grid;grid-template-columns:63px 1fr 19px 1fr 30px;align-items:center;
-  gap:7px;padding:9px 8px;background:#F7FAFF;border-radius:12px;margin-bottom:8px
-}
-.day{font-size:12px;font-weight:900;color:var(--blue);background:var(--blue-soft);padding:7px 4px;text-align:center;border-radius:8px}
-.segment select{height:39px;font-size:13px;padding:0 7px}
-.arrow{text-align:center;color:#8DA4C7;font-weight:900}
-.remove{width:28px;height:28px;border-radius:8px;background:#fff;color:#8DA4C7;font-weight:900}
-.form-actions{display:grid;grid-template-columns:1fr 1.55fr;gap:9px;margin-top:18px}
-.ghost{height:52px;border-radius:13px;background:#F0F5FF;color:var(--blue);font-weight:800}
-.analyze{height:52px;border-radius:13px;background:var(--blue);color:#fff;font-weight:900}
-.results{display:flex;flex-direction:column;gap:15px}
-.result-top{
-  display:flex;justify-content:space-between;gap:20px;align-items:center;
-  padding:25px 27px;border-radius:26px;background:#fff;border:1px solid var(--line)
-}
-.reco small{color:var(--muted);font-weight:800;display:block;margin-bottom:8px}
-.reco h3{font-size:28px;margin:0 0 9px;letter-spacing:-1.1px;color:var(--blue-dark)}
-.reco p{color:var(--muted);line-height:1.5;margin:0;font-size:14px}
-.saving{
-  flex-shrink:0;text-align:center;background:var(--green-soft);color:#087965;
-  border-radius:20px;padding:17px 20px;min-width:178px
-}
-.saving small{font-weight:800;display:block;margin-bottom:5px}
-.saving strong{font-size:29px;letter-spacing:-1px}
-.result-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:15px}
-.box{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px}
-.box h4{font-size:17px;margin:0 0 20px;letter-spacing:-.4px}
-.bar-row{margin-bottom:17px}
-.bar-name{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:14px;font-weight:800}
-.bar-name em{font-style:normal;color:#465672}
-.bar-track{height:12px;background:#ECF1F8;border-radius:999px;overflow:hidden}
-.bar-fill{height:100%;border-radius:999px;background:#A1B5D5;transition:width .55s ease}
-.bar-fill.pass{background:#9CB4DA}
-.bar-fill.ic{background:#5B92E6}
-.bar-fill.mix{background:var(--green)}
-.reason{
-  border-radius:15px;background:#F7FAFF;padding:14px;color:#4B5E7D;
-  font-size:13px;line-height:1.55;margin-top:12px
-}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:420px}
-th{text-align:left;color:#7788A1;background:#F5F8FD;font-size:12px}
-td,th{padding:11px 9px;border-bottom:1px solid #EEF2F8}
-td:last-child{text-align:right;font-weight:900}
-.route-label{font-weight:800}
-.linkline{
-  display:flex;justify-content:flex-end;gap:8px;margin-top:14px
-}
-.outline-btn{
-  border-radius:11px;padding:11px 15px;background:#fff;color:var(--blue);
-  border:1px solid #D4E0F2;font-weight:800;font-size:13px
-}
-.final-cta{padding:76px 0;background:#fff}
-.cta-card{
-  border-radius:34px;background:var(--blue);color:#fff;text-align:center;
-  padding:55px 22px;position:relative;overflow:hidden
-}
-.cta-card:before,.cta-card:after{
-  content:"";position:absolute;background:rgba(255,255,255,.10);border-radius:50%
-}
-.cta-card:before{width:270px;height:270px;top:-150px;right:-90px}
-.cta-card:after{width:190px;height:190px;bottom:-110px;left:-50px}
-.cta-card h2{position:relative;font-size:34px;margin:0 0 13px;letter-spacing:-1.6px}
-.cta-card p{position:relative;color:#DBE8FF;margin:0 0 29px;font-size:17px}
-.white-btn{position:relative;background:#fff;color:var(--blue);font-weight:900;height:54px;padding:0 25px;border-radius:15px}
-footer{background:#15233D;color:#AAB8CE;padding:35px 0}
-.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:13px}
-.footer-logo{font-size:20px;font-weight:900;color:#fff;margin-bottom:7px}
-.modal{
-  position:fixed;inset:0;background:rgba(16,29,53,.46);display:none;
-  align-items:center;justify-content:center;padding:18px;z-index:60
-}
-.modal.open{display:flex}
-.modal-card{
-  width:min(480px,100%);background:#fff;border-radius:25px;padding:25px;
-  box-shadow:0 28px 80px rgba(11,23,45,.24)
-}
-.modal-card h3{margin:0 0 10px}
-.modal-card p{color:var(--muted);line-height:1.6;margin:0 0 20px}
-.share-link{
-  display:flex;background:#F5F8FD;border-radius:12px;padding:13px;
-  justify-content:space-between;align-items:center;color:#61738E;font-size:13px
-}
-.close-modal{margin-top:16px;width:100%;height:48px;border-radius:12px;background:var(--blue);color:white;font-weight:900}
-.toast{
-  position:fixed;bottom:25px;left:50%;transform:translate(-50%,30px);
-  opacity:0;pointer-events:none;background:#14253E;color:#fff;padding:14px 20px;
-  border-radius:13px;font-weight:800;font-size:14px;transition:.25s;z-index:80
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.disclaimer{
-  font-size:12px;line-height:1.55;color:#71839E;margin-top:14px;padding:0 3px
-}
-@media(max-width:980px){
-  .menu a:not(.small-cta){display:none}
-  .hero,.app{grid-template-columns:1fr}
-  .hero{padding-top:45px}
-  .visual{max-width:540px;margin:0 auto;width:100%}
-  .cards,.flow-grid{grid-template-columns:1fr 1fr}
-  .flow-grid:before{display:none}
-  .result-grid{grid-template-columns:1fr}
-}
-@media(max-width:640px){
-  .container{width:min(100% - 30px,1180px)}
-  header{height:64px}.logo{font-size:22px}
-  .small-cta{padding:10px 13px;font-size:13px}
-  .hero{gap:34px;padding:38px 0 52px}
-  .hero h1{font-size:38px;letter-spacing:-2.1px}
-  .hero p{font-size:16px}
-  .illustration{height:390px}
-  .screen-card{right:14px;top:78px;width:180px}
-  .woman{left:34px;transform:scale(.88);transform-origin:bottom left}
-  .question{left:32px;top:80px}
-  .paper{left:auto;right:18px}
-  .section{padding:55px 0}
-  .section-head{text-align:left;margin-bottom:29px}
-  .section-head h2{font-size:30px}
-  .cards,.flow-grid,.field-row{grid-template-columns:1fr}
-  .app{display:block}
-  .results{margin-top:15px}
-  .panel{padding:18px}
-  .result-top{display:block;padding:20px}
-  .saving{margin-top:17px}
-  .segment{grid-template-columns:53px 1fr 14px 1fr 26px;gap:4px;padding:8px 5px}
-  .segment select{font-size:12px}
-  .cta-card{padding:43px 15px}
-  .cta-card h2{font-size:27px}
-  .footer-inner{display:block}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>패스패스 - 봄날의 소도시 교통 정산 AI 웹서비스</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts (Noto Sans KR) -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #ffffff; /* 배경은 반드시 흰색 */
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #FBF5DD;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #E7E1B1;
+      border-radius: 3px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #306D29;
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    .pulse-marker {
+      animation: pulse-slow 2s infinite ease-in-out;
+    }
+  </style>
 </head>
-<body>
-<header>
-  <div class="container nav">
-    <a class="logo" href="#top"><span class="logo-mark">P</span>패스패스</a>
-    <nav class="menu" aria-label="주요 메뉴">
-      <a href="#problem">서비스 소개</a>
-      <a href="#flow">이용방법</a>
-      <a href="#planner">비용 비교</a>
-      <a class="small-cta" href="#planner">계산 시작</a>
-    </nav>
-  </div>
-</header>
+<body class="min-h-screen bg-white text-black flex flex-col justify-between">
 
-<main id="top">
-<section class="container hero">
-  <div>
-    <span class="badge">✈ 일본 소도시 자유여행 교통비 비교</span>
-    <h1>패스를 살까,<br>그냥 탈까?<br><span>고민은 패스패스.</span></h1>
-    <p>여행 동선만 입력하면 교통패스와 IC카드·개별 승차권을 비교해 가장 경제적인 이동 방법을 추천합니다.</p>
-    <div class="actions">
-      <a class="btn btn-primary" href="#planner">내 여행 교통비 계산하기 →</a>
-      <a class="btn btn-secondary" href="#flow">이용방법 보기</a>
-    </div>
-    <div class="hero-note"><span class="check">✓</span> 소도시 이동경로와 비용 비교를 한 화면에서 확인</div>
-  </div>
-  <div class="visual" aria-label="교통비 계산을 고민하는 여행자 일러스트">
-    <div class="illustration">
-      <div class="ill-top"><span class="ill-label">여행 경비 계산 중</span><span class="ill-price">PASS vs IC CARD</span></div>
-      <div class="question">?</div>
-      <div class="woman">
-        <div class="hair"></div>
-        <div class="face"><span class="eye e1"></span><span class="eye e2"></span><span class="mouth"></span></div>
-        <div class="body"></div><div class="arm-left"><span class="hand"></span></div><div class="arm-right"><span class="hand"></span></div>
+  <!-- ==========================================
+      1. RESPONSIVE WEB HEADER (상단 글로벌 네비게이션)
+     ========================================== -->
+  <header class="sticky top-0 z-40 bg-white border-b border-[#E7E1B1] px-6 py-4 shadow-xs">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      
+      <!-- 서비스 브랜드 로고 -->
+      <div onclick="changeTab('home')" class="flex items-center gap-3 cursor-pointer active-scale">
+        <div class="w-10 h-10 rounded-xl bg-[#0D530E] flex items-center justify-center text-white font-black text-xl shadow-md">
+          🎫
+        </div>
+        <div>
+          <h1 class="font-extrabold text-xl text-black tracking-tight leading-none">패스패스</h1>
+          <span class="text-[10px] text-[#306D29] font-black tracking-wide uppercase">Spring Pass AI Optimizer</span>
+        </div>
       </div>
-      <div class="screen-card"><div class="screen-head"></div><div class="map-mini"><span class="point p1"></span><span class="point p2"></span></div><div class="mini-bar"></div></div>
-      <div class="ticket">IC CARD</div>
-      <div class="paper">교통패스?</div>
-      <div class="desk"></div>
-      <div class="stat-row">
-        <div class="visual-stat"><small>지역 패스</small><strong>¥ 16,800</strong></div>
-        <div class="visual-stat best"><small>추천 조합</small><strong>¥ 10,920</strong></div>
+
+      <!-- 통합 검색창 및 보조 컨트롤러 -->
+      <div class="flex-1 max-w-md w-full relative sm:mx-6">
+        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-black text-sm">🔍</span>
+        <input type="text" placeholder="일본 소도시 여행지나 교통 패스를 입력해 보세요!" class="w-full bg-[#FBF5DD]/50 rounded-full pl-9 pr-4 py-2 text-xs focus:outline-hidden focus:bg-[#FBF5DD] border border-[#E7E1B1] text-black font-semibold">
       </div>
-    </div>
-  </div>
-</section>
 
-<section class="section problem" id="problem">
-  <div class="container">
-    <div class="section-head">
-      <h2>교통비 계산, 왜 어려울까요?</h2>
-      <p>패스패스는 일본 소도시 자유여행을 준비하는 한국인 관광객의 복잡한 교통 의사결정을 단순하게 만듭니다.</p>
-    </div>
-    <div class="cards">
-      <article class="card"><div class="icon">🎫</div><h3>패스 종류가 너무 많음</h3><p>지역패스, 일일권, IC카드 중 내 동선에서 실제로 이득인 선택을 판단하기 어렵습니다.</p></article>
-      <article class="card"><div class="icon">🗺️</div><h3>소도시 정보가 흩어짐</h3><p>철도와 버스, 페리 정보가 따로 제공되어 구간별 비용을 직접 찾아 합산해야 합니다.</p></article>
-      <article class="card"><div class="icon">💴</div><h3>절약 금액을 모름</h3><p>패스를 구매해도 얼마나 아끼는지, 오히려 손해인지 한눈에 확인하기 어렵습니다.</p></article>
-    </div>
-  </div>
-</section>
+      <!-- 우측 데스크톱 네비게이션 버튼 (글씨 검은색) -->
+      <nav class="flex items-center gap-2">
+        <button id="nav-btn-home" onclick="changeTab('home')" class="px-4 py-2 rounded-lg text-xs font-black transition text-[#0D530E] bg-[#FBF5DD]">
+          🏠 홈
+        </button>
+        <button id="nav-btn-planner" onclick="changeTab('planner')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
+          🗺️ 내 플래너
+        </button>
+        <button id="nav-btn-saved" onclick="changeTab('saved')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
+          🔖 보관함
+        </button>
+        <button id="nav-btn-result" onclick="changeTab('result')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD] hidden">
+          💳 실시간 정산
+        </button>
+        <button id="nav-btn-my" onclick="changeTab('my')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
+          👤 마이
+        </button>
+      </nav>
 
-<section class="section" id="flow">
-  <div class="container">
-    <div class="section-head">
-      <h2>동선만 입력하면 4단계로 완료</h2>
-      <p>노선명이나 패스 종류를 몰라도 방문하고 싶은 도시를 입력해 결과를 확인할 수 있습니다.</p>
     </div>
-    <div class="flow-grid">
-      <div class="step"><div class="step-number">01</div><h3>여행 일정 입력</h3><p>날짜와 방문할 소도시를 선택합니다.</p></div>
-      <div class="step"><div class="step-number">02</div><h3>경로 자동 분석</h3><p>구간별 대중교통과 예상 요금을 찾습니다.</p></div>
-      <div class="step"><div class="step-number">03</div><h3>비용 비교</h3><p>패스와 일반 결제의 총액을 비교합니다.</p></div>
-      <div class="step"><div class="step-number">04</div><h3>결과 저장</h3><p>추천 조합을 동행자와 공유합니다.</p></div>
-    </div>
-  </div>
-</section>
+  </header>
 
-<section class="section planner" id="planner">
-  <div class="container">
-    <div class="section-head">
-      <h2>내 여행 교통비 계산하기</h2>
-      <p>시연용 데이터를 이용한 인터랙티브 프로토타입입니다. 방문 도시와 이동구간을 변경해 결과를 비교해보세요.</p>
-    </div>
-    <div class="app">
-      <form class="panel" id="plannerForm">
-        <div class="panel-title"><h3>여행 일정 입력</h3><span class="demo-tag">DEMO</span></div>
-        <div class="field-row">
-          <div><label for="days">여행 기간</label><select id="days"><option value="3">2박 3일</option><option value="5" selected>4박 5일</option><option value="7">6박 7일</option></select></div>
-          <div><label for="priority">분석 기준</label><select id="priority"><option>최저 비용 우선</option><option>환승 최소 우선</option><option>이동시간 우선</option></select></div>
-        </div>
-        <label>이동 동선</label>
-        <div class="routes">
-          <div class="routes-head"><strong>날짜별 이동</strong><button class="text-button" type="button" id="addRoute">+ 구간 추가</button></div>
-          <div id="segmentList"></div>
-        </div>
-        <div class="form-actions">
-          <button class="ghost" type="button" id="resetBtn">초기화</button>
-          <button class="analyze" type="submit">AI로 비교하기</button>
-        </div>
-        <p class="disclaimer">본 화면의 요금과 패스 명칭은 서비스 구현 시연을 위한 예시 데이터이며, 실제 구매 전 공식 교통기관의 최신 요금·적용구간 확인이 필요합니다.</p>
-      </form>
+  <!-- ==========================================
+      2. MAIN CONTENT WRAPPER
+     ========================================== -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 bg-white">
 
-      <div class="results" aria-live="polite">
-        <div class="result-top">
-          <div class="reco">
-            <small>AI 추천 결과</small>
-            <h3 id="recommendation">IC카드 + 개별 승차권</h3>
-            <p id="explanation">패스 적용 구간보다 개별 결제가 유리한 이동이 많아 혼합 결제를 추천합니다.</p>
+    <!-- ==========================================
+        TAB 1: WEB HOME (메인 와이드 화면)
+       ========================================== -->
+    <section id="sheet-home" class="space-y-12">
+      
+      <!-- 데스크톱 와이드 프로모션 배너 (햇살 미색 #FBF5DD) -->
+      <div class="relative overflow-hidden rounded-3xl bg-[#FBF5DD] p-8 md:p-12 text-black border border-[#E7E1B1] shadow-xs flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="space-y-4 max-w-2xl z-10">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#306D29] text-white text-[10px] font-black">
+            🌱 SPRING EDITION
+          </span>
+          <h2 class="text-3xl md:text-4xl font-black text-black leading-tight">
+            새싹 돋아나는 날의 일본 소도시 여행,<br>
+            <span class="text-[#0D530E]">교통비와 패스의 명쾌한 해답을 찾다</span>
+          </h2>
+          <p class="text-xs md:text-sm text-black font-medium leading-relaxed">
+            다카마쓰, 마쓰야마, 가나자와 등 일본의 감성적인 소도시 여행을 준비 중이신가요? 가고 싶은 루트를 마음껏 나열해 보세요. 복잡하게 얽힌 사철, 전차, 버스 노선을 실시간 대조하여 일반 카드와 패키지 교통패스 중 최적의 가성비 조합을 추천해 드립니다.
+          </p>
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="selectDestination('takamatsu')" class="px-6 py-3.5 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl font-bold text-xs transition transform active:scale-95 shadow-md">
+              지금 바로 교통비 정산하기 →
+            </button>
           </div>
-          <div class="saving"><small>패스 대비 절약</small><strong id="savingValue">¥ 5,880</strong></div>
         </div>
-        <div class="result-grid">
-          <div class="box">
-            <h4>결제 방식별 예상 총액</h4>
-            <div class="bar-row"><div class="bar-name"><em>소도시 지역패스</em><span id="passCost">¥ 16,800</span></div><div class="bar-track"><div class="bar-fill pass" id="passBar" style="width:100%"></div></div></div>
-            <div class="bar-row"><div class="bar-name"><em>IC카드·개별결제</em><span id="icCost">¥ 10,920</span></div><div class="bar-track"><div class="bar-fill ic" id="icBar" style="width:65%"></div></div></div>
-            <div class="bar-row"><div class="bar-name"><em>추천 조합</em><span id="mixCost">¥ 10,920</span></div><div class="bar-track"><div class="bar-fill mix" id="mixBar" style="width:65%"></div></div></div>
-            <div class="reason" id="reason">장거리 철도 이동 횟수가 적고 페리·지역버스 구간이 포함되어 패스보다 개별결제가 경제적입니다.</div>
+
+        <!-- 우측 시뮬레이션 요약 가상 위젯 -->
+        <div class="w-full md:w-80 bg-white border border-[#E7E1B1] rounded-2xl p-6 space-y-4 shadow-sm z-10 shrink-0">
+          <div class="flex justify-between items-center border-b border-[#E7E1B1] pb-3 text-black">
+            <span class="text-xs font-black">🌱 실시간 가상 정산표</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-[#306D29] animate-pulse"></span>
           </div>
-          <div class="box">
-            <h4>구간별 예상 비용</h4>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>일자</th><th>이동 구간</th><th>수단</th><th>비용</th></tr></thead>
-                <tbody id="detailTable"></tbody>
-              </table>
+          <div class="space-y-3 text-xs text-black">
+            <div class="flex justify-between">
+              <span class="font-semibold text-slate-500">일반 IC 교통카드 총합</span>
+              <span class="line-through text-slate-400">¥15,400</span>
             </div>
-            <div class="linkline">
-              <button type="button" class="outline-btn" id="saveBtn">저장하기</button>
-              <button type="button" class="outline-btn" id="shareBtn">공유하기</button>
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-600">추천 소도시 레일패스</span>
+              <span class="font-black text-[#0D530E] text-sm">¥13,000</span>
+            </div>
+            <div class="h-[1px] bg-[#E7E1B1] my-1"></div>
+            <div class="p-3 bg-[#FBF5DD] border border-[#E7E1B1] rounded-lg text-black text-center font-black">
+              🎁 교통비 단번에 ¥2,400 절약 완료!
             </div>
           </div>
         </div>
       </div>
+
+      <!-- 섹션 1: 어디로 가시나요? 일본 소도시 리스트 (데스크톱 와이드 카드 그리드) -->
+      <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h3 class="text-xl font-black text-black">가고 싶은 봄날의 소도시를 선택해 보세요</h3>
+            <p class="text-xs text-slate-500 mt-1">지역을 정하시면 가상 노선도와 주요 관광 거점 프리셋 일정을 설계기에 자동 셋팅해 드립니다.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-[#FBF5DD] px-3 py-1.5 rounded-lg border border-[#E7E1B1]">
+            <span class="text-xs font-black text-black">📍 추천 소도시 지도 연동 중</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- 다카마쓰 카드 -->
+          <div onclick="selectDestination('takamatsu')" class="group relative bg-white border border-[#E7E1B1] rounded-2xl p-6 hover:border-[#0D530E] hover:shadow-lg transition duration-300 cursor-pointer flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <span class="text-3xl p-2 bg-[#FBF5DD] rounded-xl border border-[#E7E1B1]/40">🍜</span>
+                <span class="text-[10px] bg-[#0D530E] text-white px-2.5 py-1 rounded-md font-bold">Kagawa</span>
+              </div>
+              <div>
+                <h4 class="font-black text-base text-black group-hover:text-[#0D530E] transition">다카마쓰 (시코쿠)</h4>
+                <p class="text-xs text-slate-400 mt-0.5">高松 / 우동과 현대 예술의 낭만</p>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">바다와 우동, 그리고 벚꽃이 핀 정원을 가로지르는 고토덴 열차를 만나는 조용하고 따스한 소도시 여정.</p>
+            </div>
+            <div class="border-t border-slate-100 mt-6 pt-4 flex justify-between items-center text-xs text-slate-400">
+              <span class="text-black font-semibold">핵심 거점 5곳 제공</span>
+              <span class="text-[#0D530E] group-hover:translate-x-1 transition font-bold">노선 설계기 이동 →</span>
+            </div>
+          </div>
+
+          <!-- 마쓰야마 카드 -->
+          <div onclick="selectDestination('matsuyama')" class="group relative bg-white border border-[#E7E1B1] rounded-2xl p-6 hover:border-[#0D530E] hover:shadow-lg transition duration-300 cursor-pointer flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <span class="text-3xl p-2 bg-[#FBF5DD] rounded-xl border border-[#E7E1B1]/40">♨️</span>
+                <span class="text-[10px] bg-[#306D29] text-white px-2.5 py-1 rounded-md font-bold">Ehime</span>
+              </div>
+              <div>
+                <h4 class="font-black text-base text-black group-hover:text-[#0D530E] transition">마쓰야마 (에히메)</h4>
+                <p class="text-xs text-slate-400 mt-0.5">松山 / 온천과 클래식 노면전차</p>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">센과 치히로의 모티브가 된 도고 온천과 레트로 봇짱 열차가 유유히 도시 중심을 달리는 편안한 힐링 테마지.</p>
+            </div>
+            <div class="border-t border-slate-100 mt-6 pt-4 flex justify-between items-center text-xs text-slate-400">
+              <span class="text-black font-semibold">핵심 거점 5곳 제공</span>
+              <span class="text-[#0D530E] group-hover:translate-x-1 transition font-bold">노선 설계기 이동 →</span>
+            </div>
+          </div>
+
+          <!-- 가나자와 카드 -->
+          <div onclick="selectDestination('kanazawa')" class="group relative bg-white border border-[#E7E1B1] rounded-2xl p-6 hover:border-[#0D530E] hover:shadow-lg transition duration-300 cursor-pointer flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <span class="text-3xl p-2 bg-[#FBF5DD] rounded-xl border border-[#E7E1B1]/40">🎎</span>
+                <span class="text-[10px] bg-slate-900 text-white px-2.5 py-1 rounded-md font-bold">Ishikawa</span>
+              </div>
+              <div>
+                <h4 class="font-black text-base text-black group-hover:text-[#0D530E] transition">가나자와 (호쿠리쿠)</h4>
+                <p class="text-xs text-slate-400 mt-0.5">金沢 / 에도시대 성곽과 현대미술</p>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">아름다운 겐로쿠엔 정원의 자연 경치와 21세기 현대 미술관이 선사하는 전통과 예술의 완벽한 하모니.</p>
+            </div>
+            <div class="border-t border-slate-100 mt-6 pt-4 flex justify-between items-center text-xs text-slate-400">
+              <span class="text-black font-semibold">핵심 거점 5곳 제공</span>
+              <span class="text-[#0D530E] group-hover:translate-x-1 transition font-bold">노선 설계기 이동 →</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 섹션 2: 교통패스 종류별 BEST 테마 리스트 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- 봄맞이 교통패스 카테고리 -->
+        <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4">
+          <h4 class="text-base font-black text-black">봄맞이 일본 철도 교통패스 BEST</h4>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
+              <span class="text-2xl">🚢</span>
+              <div>
+                <p class="text-xs font-black text-black">올 시코쿠 레일패스</p>
+                <p class="text-[10px] text-slate-500">시코쿠 6개 전철 무료 커버</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
+              <span class="text-2xl">🚃</span>
+              <div>
+                <p class="text-xs font-black text-black">도쿄 메트로 프리패스</p>
+                <p class="text-[10px] text-slate-500">지하철 1~3일 무제한 탑승</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
+              <span class="text-2xl">🚌</span>
+              <div>
+                <p class="text-xs font-black text-black">간사이 쓰루패스</p>
+                <p class="text-[10px] text-slate-500">간사이권 사철/버스 연계 최강</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
+              <span class="text-2xl">🚅</span>
+              <div>
+                <p class="text-xs font-black text-black">JR 전국 패스</p>
+                <p class="text-[10px] text-slate-500">신칸센 고속 이동 정밀 커버</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 상황별 인기 테마 추천 동선 -->
+        <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4">
+          <h4 class="text-base font-black text-black">AI 추천 푸릇푸릇 기획 테마 코스</h4>
+          
+          <div class="space-y-3">
+            <div onclick="selectDestination('takamatsu')" class="flex gap-4 p-3 bg-white rounded-xl border border-[#E7E1B1] cursor-pointer hover:border-[#0D530E] transition">
+              <span class="text-3xl p-2 bg-[#FBF5DD] rounded-lg border border-[#E7E1B1]/40 flex items-center">🍜</span>
+              <div>
+                <h5 class="text-xs font-bold text-black">식도락 사누키 우동 3일 투어</h5>
+                <p class="text-[10px] text-slate-500 mt-0.5">다카마쓰 우동 택시 버스와 리쓰린 공원 봄전차를 믹싱한 최대 혜택 정산 루트</p>
+                <span class="text-[9px] text-[#0D530E] font-black mt-1 inline-block">🌱 AI 매칭지수 98%</span>
+              </div>
+            </div>
+
+            <div onclick="selectDestination('matsuyama')" class="flex gap-4 p-3 bg-white rounded-xl border border-[#E7E1B1] cursor-pointer hover:border-[#0D530E] transition">
+              <span class="text-3xl p-2 bg-[#FBF5DD] rounded-lg border border-[#E7E1B1]/40 flex items-center">♨️</span>
+              <div>
+                <h5 class="text-xs font-bold text-black">도고온천 레트로 전차 낭만 기행</h5>
+                <p class="text-[10px] text-slate-500 mt-0.5">도고 온천 본관과 마쓰야마성 노면 전차 및 성곽 주변 철도 교통 프리 드로잉 동선</p>
+                <span class="text-[9px] text-[#306D29] font-black mt-1 inline-block">🌿 추천 누적 이용자 1.4만 명</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+        TAB 2: PLANNER SHEET (동선 설계기 - 데스크톱 분할 배치)
+       ========================================== -->
+    <section id="tab-planner" class="space-y-6 hidden">
+      
+      <!-- 상단 컨트롤러 및 타이틀 -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#E7E1B1] pb-4">
+        <div>
+          <h3 class="text-2xl font-black text-black flex items-center gap-2">
+            🧭 <span id="planner-region-name" class="text-[#0D530E]">다카마쓰</span> 여행 코스 설계기
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">거치고 싶은 핵심 명소와 이동수단을 우측에 등록해 주세요. 실시간 AI가 구간별 요금을 수렴합니다.</p>
+        </div>
+        
+        <div class="flex gap-2 w-full md:w-auto">
+          <select id="region-selector" onchange="onRegionSelectorChange(this.value)" class="bg-white border border-[#E7E1B1] px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-[#0D530E] focus:outline-hidden">
+            <option value="takamatsu">다카마쓰 (시코쿠)</option>
+            <option value="matsuyama">마쓰야마 (에히메)</option>
+            <option value="kanazawa">가나자와 (호쿠리쿠)</option>
+          </select>
+          <button onclick="restorePreset()" class="px-4 py-1.5 bg-[#FBF5DD] border border-[#E7E1B1] hover:bg-[#E7E1B1] text-black rounded-lg text-xs font-bold transition">
+            기본 추천코스 복원
+          </button>
+        </div>
+      </div>
+
+      <!-- 양대 칼럼 가로 분할 레이아웃 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: 일정 제어창 및 선택 입력기 (7/12) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- 구간 추가 폼 카드 (#FBF5DD) -->
+          <div class="bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-6 space-y-4 shadow-xs">
+            <span class="text-xs font-black text-[#0D530E] flex items-center gap-1.5">🌱 새로운 이동 구간 동선 등록</span>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-[10px] text-black font-bold mb-1">출발지 거점</label>
+                <select id="input-from" class="w-full bg-white border border-[#E7E1B1] px-3 py-2 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]"></select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-black font-bold mb-1">도착지 거점</label>
+                <select id="input-to" class="w-full bg-white border border-[#E7E1B1] px-3 py-2 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]"></select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-black font-bold mb-1">이동 수단</label>
+                <select id="input-type" class="w-full bg-white border border-[#E7E1B1] px-3 py-2 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]">
+                  <option value="Train">전차 / 로컬 지하철 🚃</option>
+                  <option value="Bus">버스 / 공항 리무진 🚌</option>
+                  <option value="Tram">감성 노면 전차 🚋</option>
+                  <option value="Ferry">페리 / 연안 쾌속 배 🚢</option>
+                  <option value="Walk">도보 및 길목 걷기 🚶</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="addSegmentToItinerary()" class="w-full py-3 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl text-xs font-black shadow-md transition transform active:scale-98">
+              선택한 이동 구간 리스트에 추가하기 🌿
+            </button>
+          </div>
+
+          <!-- 등록 일정 리스트 및 분석 실행 보드 -->
+          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4 shadow-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-black text-black">내가 설계한 정산 대상 루트 (<span id="itinerary-size" class="text-[#0D530E]">0</span>개)</span>
+              <button onclick="clearItineraryList()" class="text-xs text-black font-bold hover:text-rose-600 underline">전체 비우기</button>
+            </div>
+
+            <!-- 스크롤 일정 구간 컨테이너 -->
+            <div id="itinerary-list" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 custom-scroll">
+              <!-- JS 로드 영역 -->
+            </div>
+
+            <!-- 분석 실행 버튼 영역 -->
+            <div id="btn-analysis-container" class="pt-2">
+              <button onclick="runAnalysis()" class="w-full py-4 bg-slate-900 hover:bg-[#0D530E] text-white rounded-2xl text-sm font-black shadow-lg shadow-slate-900/10 transition transform active:scale-98">
+                🪄 실시간 인공지능 요금 비교 엔진 작동하기
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: 가상 노선 맵 및 안내창 (5/12) -->
+        <div class="lg:col-span-5">
+          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4 h-full flex flex-col justify-between">
+            <div>
+              <h4 class="text-sm font-black text-black flex items-center gap-1.5">
+                <span class="text-rose-500">📍</span> 소도시 시각 가상 노선 맵
+              </h4>
+              <p class="text-[11px] text-slate-500 mt-1">내가 선택한 관광 루트가 아래 맵에 실시간 드로잉 라인으로 구축됩니다.</p>
+            </div>
+
+            <!-- SVG 맵 캔버스 영역 -->
+            <div id="map-wrap" class="relative w-full aspect-square bg-[#0D530E] rounded-2xl overflow-hidden border border-[#E7E1B1] shadow-inner flex items-center justify-center my-4">
+              <div class="absolute inset-0 bg-[linear-gradient(to_right,#306D29_1px,transparent_1px),linear-gradient(to_bottom,#306D29_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-35"></div>
+              
+              <svg id="svg-map" class="absolute inset-0 w-full h-full" viewBox="0 0 100 100"></svg>
+              
+              <!-- 동적 라벨 컨테이너 -->
+              <div id="map-labels-container" class="absolute inset-0 pointer-events-none text-[8px]"></div>
+            </div>
+
+            <div class="bg-[#FBF5DD] p-4 rounded-xl border border-[#E7E1B1] text-xs text-black space-y-1.5">
+              <div class="flex items-center gap-1.5 font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+                <span>내가 선택한 주요 관광/철도 거점</span>
+              </div>
+              <div class="flex items-center gap-1.5 font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#306D29]"></span>
+                <span>미연결된 지역 예비 거점</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+        TAB 3: RESULT SHEET (실시간 정산 비교 와이드 대시보드)
+       ========================================== -->
+    <section id="sheet-result" class="space-y-8 hidden">
+      
+      <!-- 데스크톱용 절약 요약 상단 띠 배너 -->
+      <div id="result-badge-ribbon" class="p-8 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-6 bg-gradient-to-r from-[#0D530E] to-[#306D29]">
+        <div class="space-y-1 text-center sm:text-left">
+          <span class="text-[10px] font-black uppercase bg-white/20 px-3 py-1 rounded-full">AI OPTIMIZE REPORT</span>
+          <h3 id="result-main-title" class="text-2xl font-black mt-2">패스 구매가 훨씬 합리적인 코스입니다!</h3>
+          <p id="result-sub-title" class="text-xs text-white/80 mt-1">AI 솔루션 제안: 올 시코쿠 레일패스 3일권</p>
+        </div>
+
+        <div class="text-center sm:text-right shrink-0">
+          <span class="text-xs text-white/70 font-bold block">AI 예상 세이브 비용</span>
+          <p id="result-savings-display" class="text-4xl font-black text-amber-300 mt-1">+ ¥2,400</p>
+        </div>
+      </div>
+
+      <!-- 메인 정산 정보 대조 보드 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left: 비교 정산 바 차트 및 지표 (7/12) -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 shadow-xs space-y-6">
+            <h4 class="text-sm font-black text-black">📊 대중교통 패스 vs 개별 교통카드 일괄 정산액</h4>
+
+            <div class="space-y-4">
+              <!-- 일반 IC카드 금액 막대 -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold text-black">
+                  <span>일반 IC 교통카드 개별 지불 총액</span>
+                  <span id="ic-price-total" class="font-black">¥15,400</span>
+                </div>
+                <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden border border-[#E7E1B1]">
+                  <div id="bar-ic-price" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- 패스 패키지 금액 막대 -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold text-black">
+                  <span>추천 패키지 교통패스권 + 비적용구역 요금</span>
+                  <span id="pass-price-total" class="font-black">¥13,000</span>
+                </div>
+                <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden border border-[#E7E1B1]">
+                  <div id="bar-pass-price" class="bg-[#306D29] h-full rounded-full transition-all duration-1000" style="width: 80%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 디테일 요금 대조 테이블 -->
+            <div class="bg-[#FBF5DD]/50 border border-[#E7E1B1] rounded-2xl p-5 text-xs space-y-3">
+              <div class="flex justify-between text-black font-semibold">
+                <span>추천 소도시 교통 패키지 가격</span>
+                <span id="detail-base-price" class="font-bold">¥13,000</span>
+              </div>
+              <div class="flex justify-between text-black font-semibold">
+                <span>패스 불포함 버스/페리 등 현장 추가 과금액</span>
+                <span id="detail-extra-price" class="text-rose-600 font-bold">+ ¥0</span>
+              </div>
+              <div class="h-[1px] bg-[#E7E1B1] my-1"></div>
+              <div class="flex justify-between font-black text-black text-sm">
+                <span>최종 교통 실부담 총 합계</span>
+                <span id="detail-total-price">¥13,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI 지능형 코치 어드바이스 -->
+          <div class="bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-6 space-y-3">
+            <h4 class="text-sm font-black text-[#0D530E] flex items-center gap-1.5">
+              <span class="text-lg">🌿</span> AI 봄맞이 소도시 여행 정산 코치 리포트
+            </h4>
+            <p id="ai-report-box" class="text-xs text-black font-medium leading-relaxed">
+              공항버스는 시코쿠 패스 적용 대상이나, 터미널 교환 창구에서 지정석 표를 사전에 교환받으셔야 합니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: 개별 영수증 및 제휴 링크 (5/12) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 shadow-xs space-y-4">
+            <h4 class="text-sm font-black text-black">🔍 구간별 상세 요금 정산서</h4>
+
+            <!-- 영수증 스크롤 영역 -->
+            <div id="receipt-segments-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-1 custom-scroll">
+              <!-- JS 주입 -->
+            </div>
+
+            <!-- 제휴 어필리에이트 버튼 -->
+            <div class="border-t border-[#E7E1B1] pt-4 space-y-3">
+              <p class="text-[10px] text-slate-400 font-semibold text-center">제휴 파트너 최저가 예약 및 링크 공유</p>
+              <div class="grid grid-cols-2 gap-2">
+                <a href="https://www.klook.com" target="_blank" class="py-3 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl text-center font-bold text-xs shadow-md transition active-scale">
+                  🎫 Klook 제휴 할인가 구매
+                </a>
+                <button onclick="shareItinerary()" class="py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-center font-bold text-xs shadow-md transition active-scale">
+                  🔗 동선 일정 공유하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 정산 후 리셋 보정 인터랙션 -->
+      <div class="text-center">
+        <button onclick="changeTab('planner')" class="px-6 py-3 bg-[#FBF5DD] border border-[#E7E1B1] hover:bg-[#E7E1B1] text-black rounded-xl font-bold text-xs transition">
+          ← 일정 동선 보정하러 가기
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+        TAB 4: SAVED PLANS SHEET (내 보관함)
+       ========================================== -->
+    <section id="sheet-saved" class="space-y-6 hidden">
+      <div>
+        <h3 class="text-xl font-black text-black">보관된 나의 봄철 여정</h3>
+        <p class="text-xs text-slate-500 mt-1">즐겨찾기 하거나 정산 분석에 완료했던 나의 히스토리입니다.</p>
+      </div>
+
+      <div id="saved-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+        <!-- JS 로드 -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+        TAB 5: MY PROFILE SHEET (내 정보 관리)
+       ========================================== -->
+    <section id="sheet-my" class="space-y-6 hidden">
+      
+      <div class="flex items-center gap-5 bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-6 max-w-2xl">
+        <div class="w-16 h-16 rounded-full bg-white border border-[#E7E1B1] flex items-center justify-center text-4xl shadow-xs">
+          🌱
+        </div>
+        <div>
+          <span class="text-[9px] bg-[#306D29] text-white px-2 py-0.5 rounded-full font-bold">봄 소도시 마스터</span>
+          <h4 class="text-base font-black text-black mt-1">소도시를 정복하는 파릇파릇 여행자</h4>
+          <p class="text-xs text-slate-500 mt-0.5">회원 가입 일시: 2026.05.26</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 max-w-2xl space-y-4">
+        <span class="text-xs font-black text-black block">누적 절약 및 분석 이용 현황</span>
+        
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div class="bg-[#FBF5DD]/50 p-4 rounded-2xl border border-[#E7E1B1]/40">
+            <span class="text-[10px] text-slate-500 font-bold block">정산 요청 수</span>
+            <span class="text-xl font-black text-[#0D530E] mt-1 block">14회</span>
+          </div>
+          <div class="bg-[#FBF5DD]/50 p-4 rounded-2xl border border-[#E7E1B1]/40">
+            <span class="text-[10px] text-slate-500 font-bold block">교통비 절감액</span>
+            <span class="text-xl font-black text-[#306D29] mt-1 block">¥14,200</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 부가 셋팅 리스트 -->
+      <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 max-w-2xl space-y-1 text-xs text-black">
+        <div class="flex justify-between items-center py-3 border-b border-[#E7E1B1]/30 cursor-pointer hover:bg-[#FBF5DD]/20 px-2 rounded-lg transition active-scale">
+          <span>나의 여행 패스 조건 변경</span>
+          <span>❯</span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-[#E7E1B1]/30 cursor-pointer hover:bg-[#FBF5DD]/20 px-2 rounded-lg transition active-scale">
+          <span>어필리에이트 할인 쿠폰 보관함</span>
+          <span class="text-[#0D530E] font-black">2개 미사용 보관 중</span>
+        </div>
+        <div class="flex justify-between items-center py-3 cursor-pointer hover:bg-[#FBF5DD]/20 px-2 rounded-lg transition active-scale">
+          <span>고객 피드백 & 시스템 건의사항</span>
+          <span>❯</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+      3. AI ANALYZER LOADING DIALOG (웹 오버레이)
+     ========================================== -->
+  <div id="ai-loading-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-6 hidden">
+    <div class="w-full max-w-sm bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-8 text-center space-y-6 shadow-2xl">
+      
+      <!-- 싱그러운 소도시 링 스핀 -->
+      <div class="relative w-20 h-20 mx-auto">
+        <div class="absolute inset-0 rounded-full border-4 border-white"></div>
+        <div class="absolute inset-0 rounded-full border-4 border-t-[#0D530E] animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center text-3xl">🌱</div>
+      </div>
+
+      <div class="space-y-1">
+        <h5 class="text-black font-black text-base text-[#0D530E]">PassPass AI 교통 정산 중</h5>
+        <p id="loading-status" class="text-slate-600 text-xs min-h-[16px] font-semibold">봄 소도시별 철도 가격 대조 중...</p>
+      </div>
+
+      <!-- 프로그레스 바 라인 -->
+      <div class="space-y-1">
+        <div class="w-full bg-white h-2 rounded-full overflow-hidden border border-[#E7E1B1]">
+          <div id="loading-bar-inner" class="bg-[#306D29] h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+        </div>
+        <div class="flex justify-between text-[10px] font-black text-[#0D530E]">
+          <span>AI SPRING SYSTEM ACT</span>
+          <span id="loading-percent">10%</span>
+        </div>
+      </div>
+
     </div>
   </div>
-</section>
 
-<section class="final-cta">
-  <div class="container">
-    <div class="cta-card">
-      <h2>복잡한 일본 교통비 고민은 이제 패스</h2>
-      <p>소도시 자유여행의 이동경비를 한눈에 비교하고 더 합리적인 선택을 시작하세요.</p>
-      <button class="white-btn" type="button" onclick="document.querySelector('#planner').scrollIntoView({behavior:'smooth'})">교통비 비교 시작하기 →</button>
+  <!-- ==========================================
+      4. WEB FOOTER (하단 가이드라인)
+     ========================================== -->
+  <footer class="bg-slate-950 text-slate-400 text-xs py-10 px-6 border-t border-[#E7E1B1]/20">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      
+      <div class="space-y-1 text-center md:text-left">
+        <p class="font-bold text-white flex items-center gap-1.5 justify-center md:justify-start">
+          <span class="text-rose-500">🎫</span> 패스패스 (PassPass)
+        </p>
+        <p class="text-[10px] text-slate-500">AI 기반 실시간 일본 소도시 대중교통 최적 패키지 정산 분석 서비스</p>
+      </div>
+
+      <div class="text-center md:text-right text-[10px] text-slate-500 space-y-1">
+        <p>© 2026 PassPass AI. All Rights Reserved.</p>
+        <p>본 결과 산출표는 실제 일본 현지 JR 노선 및 지자체 버스 정기 요금을 바탕으로 추정 정산되며, 시즌 요금 변동에 영향받을 수 있습니다.</p>
+      </div>
+
     </div>
-  </div>
-</section>
-</main>
+  </footer>
 
-<footer>
-  <div class="container footer-inner">
-    <div><div class="footer-logo">패스패스</div>일본 자유여행자를 위한 AI 교통비 비교 서비스</div>
-    <div>© 2026 PassPass. Prototype for tourism service planning.</div>
-  </div>
-</footer>
+  <!-- ==========================================
+      5. JAVASCRIPT LOGIC MATRIX (웹 스크립트 엔진)
+     ========================================== -->
+  <script>
+    // 소도시 정보 DB
+    const GEOPASS_DB = {
+      takamatsu: {
+        id: "takamatsu",
+        title: "시코쿠 / 다카마쓰 🌿",
+        hubs: [
+          { nameKo: "다카마쓰 공항", x: 50, y: 85 },
+          { nameKo: "다카마쓰역", x: 50, y: 25 },
+          { nameKo: "리쓰린 공원", x: 48, y: 48 },
+          { nameKo: "고토히라역 (고토덴)", x: 25, y: 70 },
+          { nameKo: "쇼도섬 페리 터미널", x: 75, y: 15 }
+        ],
+        preset: [
+          { from: "다카마쓰 공항", to: "다카마쓰역", type: "Bus" },
+          { from: "다카마쓰역", to: "리쓰린 공원", type: "Train" },
+          { from: "리쓰린 공원", to: "고토히라역 (고토덴)", type: "Train" },
+          { from: "다카마쓰역", to: "쇼도섬 페리 터미널", type: "Ferry" }
+        ],
+        passes: [{ name: "올 시코쿠 레일패스 3일권", price: 13000 }]
+      },
+      matsuyama: {
+        id: "matsuyama",
+        title: "에히메 / 마쓰야마 🍊",
+        hubs: [
+          { nameKo: "마쓰야마 공항", x: 20, y: 55 },
+          { nameKo: "마쓰야마시역", x: 45, y: 55 },
+          { nameKo: "도고온천역", x: 75, y: 35 },
+          { nameKo: "오즈역 (가류산장)", x: 30, y: 85 },
+          { nameKo: "우치코역", x: 50, y: 80 }
+        ],
+        preset: [
+          { from: "마쓰야마 공항", to: "마쓰야마시역", type: "Bus" },
+          { from: "마쓰야마시역", to: "도고온천역", type: "Tram" },
+          { from: "마쓰야마시역", to: "우치코역", type: "Train" }
+        ],
+        passes: [{ name: "마쓰야마 / 우치코 / 오즈 패스", price: 2500 }]
+      },
+      kanazawa: {
+        id: "kanazawa",
+        title: "호쿠리쿠 / 가나자와 🌸",
+        hubs: [
+          { nameKo: "고마쓰 공항", x: 20, y: 80 },
+          { nameKo: "가나자와역", x: 50, y: 35 },
+          { nameKo: "겐로쿠엔 (겸육원)", x: 60, y: 55 },
+          { nameKo: "21세기 미술관", x: 55, y: 65 },
+          { nameKo: "도야마역", x: 90, y: 20 }
+        ],
+        preset: [
+          { from: "고마쓰 공항", to: "가나자와역", type: "Bus" },
+          { from: "가나자와역", to: "겐로쿠엔 (겸육원)", type: "Bus" },
+          { from: "가나자와역", to: "도야마역", type: "Train" }
+        ],
+        passes: [{ name: "호쿠리쿠 에리어 패스 4일권", price: 5090 }]
+      }
+    };
 
-<div class="modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="modal-card">
-    <h3 id="modalTitle">여행 결과 공유하기</h3>
-    <p>동행자에게 비교 결과를 전달할 수 있도록 공유 링크가 생성되었습니다.</p>
-    <div class="share-link"><span>passpass.jp/trip/hiroshima-demo</span><button class="text-button" type="button" id="copyBtn">복사</button></div>
-    <button class="close-modal" type="button" id="closeModal">닫기</button>
-  </div>
-</div>
-<div class="toast" id="toast">저장되었습니다.</div>
+    // 글로벌 상태
+    let state = {
+      activeTab: "home",
+      currentRegion: GEOPASS_DB.takamatsu,
+      itinerary: [...GEOPASS_DB.takamatsu.preset],
+      savedPlans: [
+        { title: "봄날의 시코쿠 벚꽃 꽃길 루트 🌿", cost: "¥13,000", savings: "¥2,400" },
+        { title: "에히메 싱그러운 온천투어 ♨️", cost: "¥2,500", savings: "¥820" }
+      ]
+    };
 
-<script>
-const locations = ["히로시마","미야지마","오노미치","이와쿠니","마쓰야마","도고온천","가고시마","사쿠라지마","구마모토","아소"];
-const fareMap = {
-  "히로시마|미야지마": {fare: 840, mode:"JR + 페리"},
-  "히로시마|오노미치": {fare: 3040, mode:"JR"},
-  "히로시마|이와쿠니": {fare: 1540, mode:"JR"},
-  "히로시마|마쓰야마": {fare: 5200, mode:"고속선"},
-  "마쓰야마|도고온천": {fare: 460, mode:"노면전차"},
-  "가고시마|사쿠라지마": {fare: 500, mode:"페리"},
-  "가고시마|구마모토": {fare: 6560, mode:"신칸센"},
-  "구마모토|아소": {fare: 2260, mode:"JR"},
-  "히로시마|가고시마": {fare: 13500, mode:"신칸센"},
-  "마쓰야마|히로시마": {fare: 5200, mode:"고속선"}
-};
-let segments = [
-  {from:"히로시마",to:"미야지마"},
-  {from:"히로시마",to:"오노미치"},
-  {from:"히로시마",to:"이와쿠니"}
-];
+    window.onload = () => {
+      changeTab('home');
+      renderSavedPlans();
+    };
 
-function money(value){ return "¥ " + value.toLocaleString("ko-KR"); }
-function options(current){
-  return locations.map(place => `<option ${place===current ? "selected":""}>${place}</option>`).join("");
-}
-function getFare(from,to){
-  if(from === to) return {fare:0,mode:"도보·시내 이동"};
-  const direct = fareMap[`${from}|${to}`] || fareMap[`${to}|${from}`];
-  if(direct) return direct;
-  return {fare: 1980, mode:"지역교통 환승"};
-}
-function renderSegments(){
-  const list = document.getElementById("segmentList");
-  list.innerHTML = segments.map((s,i) => `
-    <div class="segment">
-      <span class="day">DAY ${i+1}</span>
-      <select class="from" data-index="${i}" aria-label="${i+1}일차 출발지">${options(s.from)}</select>
-      <span class="arrow">→</span>
-      <select class="to" data-index="${i}" aria-label="${i+1}일차 도착지">${options(s.to)}</select>
-      <button class="remove" data-index="${i}" type="button" aria-label="구간 삭제">×</button>
-    </div>`).join("");
-  list.querySelectorAll("select").forEach(el => el.addEventListener("change", e => {
-    const index = Number(e.target.dataset.index);
-    segments[index][e.target.className] = e.target.value;
-  }));
-  list.querySelectorAll(".remove").forEach(btn => btn.addEventListener("click", e => {
-    if(segments.length === 1) return showToast("이동 구간은 1개 이상 필요합니다.");
-    segments.splice(Number(e.target.dataset.index),1);
-    renderSegments();
-  }));
-}
-function analyze(){
-  const details = segments.map((s,i) => {
-    const data = getFare(s.from,s.to);
-    return {day:i+1, ...s, ...data};
-  });
-  const individual = details.reduce((sum,item) => sum + item.fare,0);
-  const days = Number(document.getElementById("days").value);
-  const passBase = days <= 3 ? 9800 : days <= 5 ? 16800 : 23800;
-  const ferryExtra = details.filter(d => d.mode.includes("페리") || d.mode.includes("고속선")).reduce((a,d) => a + Math.round(d.fare*.35),0);
-  const pass = passBase + ferryExtra;
-  const mix = Math.min(individual, Math.round(individual * (individual > 15000 ? .88 : 1)), pass);
-  const lowest = Math.min(individual, mix, pass);
-  const recommended = lowest === pass ? "소도시 지역패스" : lowest < individual ? "지역패스 + 개별 승차권" : "IC카드 + 개별 승차권";
-  const savings = Math.max(0, pass - lowest);
-  let reason = "시내·근거리 이동과 패스 미적용 이동이 포함되어 패스보다 개별 결제가 경제적입니다.";
-  if(recommended === "소도시 지역패스") reason = "장거리 이동이 여러 번 포함되어 일정 기간 무제한 이용이 가능한 지역패스가 경제적입니다.";
-  if(recommended === "지역패스 + 개별 승차권") reason = "장거리 철도 구간은 패스를 활용하고 일부 비적용 구간만 개별 결제하는 조합이 가장 경제적입니다.";
+    // 반응형 탭 전환
+    function changeTab(tabId) {
+      state.activeTab = tabId;
 
-  document.getElementById("recommendation").textContent = recommended;
-  document.getElementById("explanation").textContent = reason;
-  document.getElementById("savingValue").textContent = money(savings);
-  document.getElementById("passCost").textContent = money(pass);
-  document.getElementById("icCost").textContent = money(individual);
-  document.getElementById("mixCost").textContent = money(lowest);
-  document.getElementById("reason").textContent = reason;
-  const maximum = Math.max(pass, individual, lowest, 1);
-  document.getElementById("passBar").style.width = `${(pass/maximum)*100}%`;
-  document.getElementById("icBar").style.width = `${(individual/maximum)*100}%`;
-  document.getElementById("mixBar").style.width = `${(lowest/maximum)*100}%`;
-  document.getElementById("detailTable").innerHTML = details.map(d => `
-    <tr><td>DAY ${d.day}</td><td class="route-label">${d.from} → ${d.to}</td><td>${d.mode}</td><td>${money(d.fare)}</td></tr>
-  `).join("");
-}
-function showToast(message){
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove("show"),2300);
-}
-document.getElementById("addRoute").addEventListener("click", () => {
-  if(segments.length >= 6) return showToast("시연 화면에서는 최대 6구간까지 추가할 수 있습니다.");
-  segments.push({from:"히로시마",to:"미야지마"});
-  renderSegments();
-});
-document.getElementById("resetBtn").addEventListener("click", () => {
-  segments = [{from:"히로시마",to:"미야지마"},{from:"히로시마",to:"오노미치"},{from:"히로시마",to:"이와쿠니"}];
-  document.getElementById("days").value = "5";
-  renderSegments(); analyze(); showToast("기본 예시 일정으로 초기화했습니다.");
-});
-document.getElementById("plannerForm").addEventListener("submit", e => {
-  e.preventDefault(); analyze(); showToast("AI 교통비 분석이 완료되었습니다.");
-});
-document.getElementById("saveBtn").addEventListener("click", () => showToast("여행 계획이 저장되었습니다."));
-document.getElementById("shareBtn").addEventListener("click", () => document.getElementById("shareModal").classList.add("open"));
-document.getElementById("closeModal").addEventListener("click", () => document.getElementById("shareModal").classList.remove("open"));
-document.getElementById("shareModal").addEventListener("click", e => { if(e.target.id === "shareModal") e.currentTarget.classList.remove("open"); });
-document.getElementById("copyBtn").addEventListener("click", () => {
-  navigator.clipboard?.writeText("https://passpass.jp/trip/hiroshima-demo");
-  showToast("공유 링크가 복사되었습니다.");
-});
-renderSegments();
-analyze();
-</script>
+      // 시트 제어
+      const sheets = ['home', 'planner', 'result', 'saved', 'my'];
+      sheets.forEach(s => {
+        const sheetNode = document.getElementById(`sheet-${s}`);
+        const plannerTabNode = document.getElementById('tab-planner');
+        
+        if (s === 'planner') {
+          if (tabId === 'planner') {
+            plannerTabNode.classList.remove('hidden');
+          } else {
+            plannerTabNode.classList.add('hidden');
+          }
+        } else {
+          if (sheetNode) {
+            if (s === tabId) {
+              sheetNode.classList.remove('hidden');
+            } else {
+              sheetNode.classList.add('hidden');
+            }
+          }
+        }
+      });
+
+      // 네비게이션 버튼 가시성 하이라이트 제어
+      sheets.forEach(s => {
+        const btnNode = document.getElementById(`nav-btn-${s}`);
+        if (btnNode) {
+          if (s === tabId) {
+            btnNode.className = "px-4 py-2 rounded-lg text-xs font-black transition text-[#0D530E] bg-[#FBF5DD]";
+          } else {
+            btnNode.className = "px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]";
+          }
+        }
+      });
+    }
+
+    // 소도시 선정 시 플래너 로딩
+    function selectDestination(regionId) {
+      state.currentRegion = GEOPASS_DB[regionId];
+      state.itinerary = [...state.currentRegion.preset];
+      
+      document.getElementById('current-region-display').innerText = state.currentRegion.title;
+      
+      initPlannerUI();
+      changeTab('planner');
+    }
+
+    // 설계기 선택 변경 시
+    function onRegionSelectorChange(regionId) {
+      state.currentRegion = GEOPASS_DB[regionId];
+      state.itinerary = [...state.currentRegion.preset];
+      initPlannerUI();
+    }
+
+    // 코스 원본 복원
+    function restorePreset() {
+      state.itinerary = [...state.currentRegion.preset];
+      initPlannerUI();
+    }
+
+    // 일정 전체 삭제
+    function clearItineraryList() {
+      state.itinerary = [];
+      initPlannerUI();
+    }
+
+    // 플래너 데이터 빌딩
+    function initPlannerUI() {
+      document.getElementById('planner-region-name').innerText = state.currentRegion.title.split(" / ")[1].replace("🌿", "").replace("🍊", "").replace("🌸", "").trim();
+      document.getElementById('itinerary-size').innerText = state.itinerary.length;
+
+      // 셀렉트 박스 주입
+      const selectFrom = document.getElementById('input-from');
+      const selectTo = document.getElementById('input-to');
+      selectFrom.innerHTML = '';
+      selectTo.innerHTML = '';
+
+      state.currentRegion.hubs.forEach((hub, i) => {
+        const op1 = document.createElement('option');
+        op1.value = hub.nameKo;
+        op1.innerText = hub.nameKo;
+        selectFrom.appendChild(op1);
+
+        const op2 = document.createElement('option');
+        op2.value = hub.nameKo;
+        op2.innerText = hub.nameKo;
+        if (i === 1) op2.selected = true;
+        selectTo.appendChild(op2);
+      });
+
+      // 일정 리스트 카드 바인딩
+      const container = document.getElementById('itinerary-list');
+      container.innerHTML = '';
+
+      if (state.itinerary.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-black text-xs font-bold bg-[#FBF5DD]/20 border border-dashed border-[#E7E1B1] rounded-2xl">
+            🌱 현재 추가된 소도시 경로가 없습니다. 위의 추가창에서 동선을 생성해 주세요.
+          </div>
+        `;
+        document.getElementById('btn-analysis-container').classList.add('hidden');
+      } else {
+        document.getElementById('btn-analysis-container').classList.remove('hidden');
+
+        state.itinerary.forEach((item, index) => {
+          let emoji = '🚃';
+          if (item.type === 'Bus') emoji = '🚌';
+          if (item.type === 'Tram') emoji = '🚋';
+          if (item.type === 'Ferry') emoji = '🚢';
+          if (item.type === 'Walk') emoji = '🚶';
+
+          const card = document.createElement('div');
+          card.className = "flex items-center justify-between p-3.5 bg-[#FBF5DD]/40 hover:bg-[#FBF5DD] rounded-xl border border-[#E7E1B1] text-xs text-black transition";
+          card.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="w-5 h-5 rounded-full bg-[#E7E1B1] text-[10px] text-black font-black flex items-center justify-center">${index + 1}</span>
+              <div>
+                <p class="font-bold">${item.from} ➔ ${item.to}</p>
+                <span class="text-[9px] text-black font-bold mt-0.5 inline-block bg-white px-2 py-0.5 rounded-sm border border-[#E7E1B1]/45">${emoji} ${item.type}</span>
+              </div>
+            </div>
+            <button onclick="removeSegment(${index})" class="text-xs text-black font-bold hover:text-rose-600 px-2">✕</button>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      // 와이드 SVG 맵 드로잉
+      drawVirtualSVGMap();
+    }
+
+    // 동선 단일 추가
+    function addSegmentToItinerary() {
+      const fromVal = document.getElementById('input-from').value;
+      const toVal = document.getElementById('input-to').value;
+      const typeVal = document.getElementById('input-type').value;
+
+      if (fromVal === toVal) {
+        alert("출발지와 목적지는 중복될 수 없습니다.");
+        return;
+      }
+
+      state.itinerary.push({ from: fromVal, to: toVal, type: typeVal });
+      initPlannerUI();
+    }
+
+    // 동선 제거
+    function removeSegment(index) {
+      state.itinerary.splice(index, 1);
+      initPlannerUI();
+    }
+
+    // 가상 SVG 맵 렌더러
+    function drawVirtualSVGMap() {
+      const svg = document.getElementById('svg-map');
+      const labelContainer = document.getElementById('map-labels-container');
+      svg.innerHTML = '';
+      labelContainer.innerHTML = '';
+
+      // 격자 선
+      svg.innerHTML += `
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#306D29" stroke-width="0.3" opacity="0.2" />
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+      `;
+
+      // 1. 등록 일정 패키지 연결선
+      state.itinerary.forEach((seg) => {
+        const fromHub = state.currentRegion.hubs.find(h => h.nameKo === seg.from);
+        const toHub = state.currentRegion.hubs.find(h => h.nameKo === seg.to);
+        if (fromHub && toHub) {
+          let color = '#E7E1B1'; 
+          let dash = '0';
+          if (seg.type === 'Walk') {
+            color = '#FFFFFF';
+            dash = '1.5,1.5';
+          } else if (seg.type === 'Ferry') {
+            color = '#FFFFFF';
+            dash = '3,3';
+          } else if (seg.type === 'Bus') {
+            color = '#306D29';
+          } else if (seg.type === 'Train') {
+            color = '#FFFFFF';
+          }
+
+          svg.innerHTML += `
+            <line x1="${fromHub.x}" y1="${fromHub.y}" x2="${toHub.x}" y2="${toHub.y}" 
+              stroke="${color}" stroke-width="1.3" stroke-dasharray="${dash}" />
+            <circle cx="${(fromHub.x+toHub.x)/2}" cy="${(fromHub.y+toHub.y)/2}" r="1" fill="#FBF5DD" class="pulse-marker" />
+          `;
+        }
+      });
+
+      // 2. 주요 거점 마커 생성
+      state.currentRegion.hubs.forEach((hub) => {
+        const isIncluded = state.itinerary.some(it => it.from === hub.nameKo || it.to === hub.nameKo);
+        const markerColor = isIncluded ? '#FFFFFF' : '#306D29';
+        const rad = isIncluded ? '2.5' : '1.5';
+
+        svg.innerHTML += `
+          <circle cx="${hub.x}" cy="${hub.y}" r="${rad}" fill="${markerColor}" />
+          ${isIncluded ? `<circle cx="${hub.x}" cy="${hub.y}" r="4.5" fill="none" stroke="#E7E1B1" stroke-width="0.3" opacity="0.8" class="animate-ping" />` : ''}
+        `;
+
+        // 라벨 생성
+        const lbl = document.createElement('div');
+        lbl.style.left = `${hub.x}%`;
+        lbl.style.top = `${hub.y}%`;
+        lbl.className = `absolute -translate-x-1/2 -translate-y-5 px-2 py-0.5 rounded-md text-[7px] font-bold whitespace-nowrap pointer-events-none transition ${
+          isIncluded 
+            ? 'bg-[#FBF5DD] text-black font-black border border-[#E7E1B1] shadow-xs' 
+            : 'bg-[#0D530E] text-white opacity-60'
+        }`;
+        lbl.innerText = hub.nameKo;
+        labelContainer.appendChild(lbl);
+      });
+    }
+
+    // AI 계산기 로더 기동
+    function runAnalysis() {
+      const modal = document.getElementById('ai-loading-modal');
+      const bar = document.getElementById('loading-bar-inner');
+      const text = document.getElementById('loading-status');
+      const percent = document.getElementById('loading-percent');
+
+      modal.classList.remove('hidden');
+      
+      let step = 10;
+      bar.style.width = '10%';
+      percent.innerText = '10%';
+      text.innerText = '실시간 노선별 기본 단가 매칭 중...';
+
+      const statuses = [
+        "선택 패키지 교통패스 손익 구간 검증 중...",
+        "비적용 구역 버스/페리 요금 가산 필터 가동 중...",
+        "최종 AI 교통 정산 최적 패키지 분석 완료!"
+      ];
+
+      const interval = setInterval(() => {
+        if (step < 95) {
+          step += Math.floor(Math.random() * 8) + 2;
+          bar.style.width = `${step}%`;
+          percent.innerText = `${step}%`;
+          if (step > 40 && step < 80) {
+            text.innerText = statuses[0];
+          } else if (step >= 80) {
+            text.innerText = statuses[1];
+          }
+        }
+      }, 150);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        bar.style.width = '100%';
+        percent.innerText = '100%';
+        text.innerText = '완료!';
+
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          processFares();
+          document.getElementById('nav-btn-result').classList.remove('hidden');
+          changeTab('result');
+        }, 400);
+
+      }, 1800);
+    }
+
+    // 요금 분기 분석 연산
+    function processFares() {
+      const activePass = state.currentRegion.passes[0];
+      let icTotal = 0;
+      let segments = [];
+
+      state.itinerary.forEach((item) => {
+        let fare = 240;
+        let isCovered = true;
+
+        if (item.type === 'Bus') {
+          fare = 450;
+          isCovered = false;
+        } else if (item.type === 'Ferry') {
+          fare = 700;
+          isCovered = state.currentRegion.id === 'takamatsu';
+        } else if (item.type === 'Train') {
+          if (item.to.includes('고토히라') || item.to.includes('우치코') || item.to.includes('도야마')) {
+            fare = 860;
+          } else {
+            fare = 320;
+          }
+        } else if (item.type === 'Walk') {
+          fare = 0;
+        }
+
+        icTotal += fare;
+        segments.push({
+          from: item.from,
+          to: item.to,
+          fare: fare,
+          isCovered: isCovered,
+          type: item.type
+        });
+      });
+
+      const extraCosts = segments
+        .filter(s => !s.isCovered)
+        .reduce((sum, curr) => sum + curr.fare, 0);
+
+      const passTotal = activePass.price + extraCosts;
+      const savings = icTotal - passTotal;
+
+      const mainTitle = document.getElementById('result-main-title');
+      const subTitle = document.getElementById('result-sub-title');
+      const savingsDisp = document.getElementById('result-savings-display');
+      const ribbon = document.getElementById('result-badge-ribbon');
+
+      if (savings > 0) {
+        mainTitle.innerText = "교통패스를 준비해 가시는 게 압도적으로 저렴합니다!";
+        subTitle.innerText = `추천 대안 솔루션: [${activePass.name}]`;
+        savingsDisp.innerText = `+ ¥${savings.toLocaleString()}`;
+        ribbon.className = "p-8 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-6 bg-gradient-to-r from-[#0D530E] to-[#306D29] shadow-emerald-500/10";
+      } else {
+        mainTitle.innerText = "패스보단 일반 교통카드(IC) 충전 정산이 훨씬 유리합니다!";
+        subTitle.innerText = "분석 소결: 이동 빈도수 대비 패키지 가격이 높게 나타납니다.";
+        savingsDisp.innerText = `¥0`;
+        ribbon.className = "p-8 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-6 bg-gradient-to-r from-slate-800 to-slate-700 shadow-slate-800/10";
+      }
+
+      // 지표 바 차트 데이터 갱신
+      document.getElementById('ic-price-total').innerText = `¥${icTotal.toLocaleString()}`;
+      document.getElementById('pass-price-total').innerText = `¥${passTotal.toLocaleString()}`;
+
+      const maxVal = Math.max(icTotal, passTotal);
+      document.getElementById('bar-ic-price').style.width = `${(icTotal / maxVal) * 100}%`;
+      document.getElementById('bar-pass-price').style.width = `${(passTotal / maxVal) * 100}%`;
+
+      // 디테일 요금표
+      document.getElementById('detail-base-price').innerText = `¥${activePass.price.toLocaleString()}`;
+      document.getElementById('detail-extra-price').innerText = `+ ¥${extraCosts.toLocaleString()}`;
+      document.getElementById('detail-total-price').innerText = `¥${passTotal.toLocaleString()}`;
+
+      // 맞춤형 가이드 텍스트
+      let adviceText = "";
+      if (state.currentRegion.id === 'takamatsu') {
+        adviceText = "다카마쓰 우동 투어 노선이나 쇼도섬 페리는 본 시코쿠 레일패스로 100% 무상 통과가 지원됩니다. 단, 공항에서 출발하는 노선 리무진은 개찰구 승강 전, 공항 카운터에서 실물 예약 표로 사전에 발권하셔야 무료 승차가 안정적으로 적용됩니다.";
+      } else if (state.currentRegion.id === 'matsuyama') {
+        adviceText = "마쓰야마 봇짱 전차는 해당 에리어 패스 사용 범위에서 제외되므로 1회 탑승 시 추가 부담 요금이 부과될 수 있습니다. 일반 노면 전차는 하차 승무원 스캔만으로 완벽 프리패스 무제한 탑승이 보장됩니다.";
+      } else {
+        adviceText = "호쿠리쿠 가나자와 신칸센(특급 자유석) 게이트는 본 호쿠리쿠 패스 스루 통과가 지원됩니다. 다만, 미술관 인근 셔틀 버스 중 일부 민간 노선은 패스 미적용 유료 구역이니 탑승 전 꼭 후면 가이드를 참고하세요.";
+      }
+      document.getElementById('ai-report-box').innerText = adviceText;
+
+      // 구간 요금표 빌드 (검은색 텍스트화 보장)
+      const container = document.getElementById('receipt-segments-list');
+      container.innerHTML = '';
+
+      segments.forEach((seg, idx) => {
+        let typeText = '🚃 일반 열차 전차';
+        if (seg.type === 'Bus') typeText = '🚌 시외/시내 버스 노선';
+        if (seg.type === 'Tram') typeText = '🚋 낭만 노면 전차';
+        if (seg.type === 'Ferry') typeText = '🚢 고속 페리 여객선';
+        if (seg.type === 'Walk') typeText = '🚶 도보 풍경 걷기';
+
+        const row = document.createElement('div');
+        row.className = "p-3 border border-[#E7E1B1] rounded-xl text-xs space-y-1 bg-[#FBF5DD]/20 hover:bg-[#FBF5DD]/50 transition text-black";
+        row.innerHTML = `
+          <div class="flex justify-between items-center text-[10px] text-black">
+            <span class="font-bold text-black">구간 ${idx+1}</span>
+            <span class="font-black ${seg.isCovered ? 'text-[#0D530E]' : 'text-rose-600'}">
+              ${seg.isCovered ? '패스 무제한 커버' : '현장 개별 지불'}
+            </span>
+          </div>
+          <div class="flex justify-between font-black text-black">
+            <span>${seg.from} ➔ ${seg.to}</span>
+            <span>¥${seg.fare.toLocaleString()}</span>
+          </div>
+          <p class="text-[9px] text-black font-semibold">${typeText}</p>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // 저장 히스토리 렌더링 (와이드 카드 양식)
+    function renderSavedPlans() {
+      const container = document.getElementById('saved-list');
+      container.innerHTML = '';
+
+      state.savedPlans.forEach((plan) => {
+        const item = document.createElement('div');
+        item.className = "p-5 bg-[#FBF5DD] border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] transition space-y-3 cursor-pointer text-black";
+        item.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-black text-black">${plan.title}</span>
+            <span class="text-xs bg-white text-[#0D530E] border border-[#E7E1B1] px-3 py-0.5 rounded-full font-black">절약: ${plan.savings}</span>
+          </div>
+          <div class="flex justify-between text-xs text-black font-semibold">
+            <span>설정 거점: 4곳</span>
+            <span>패스 최종 비용액: <span class="font-black text-black">${plan.cost}</span></span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // 공유하기 토스트
+    function shareItinerary() {
+      alert("플래너 동선 요금 분석서가 클립보드에 복사되었습니다! 여행 메이트에게 벚꽃길 동선을 전송해 보세요. 🌱");
+    }
+
+    // 가상 모달 가이드
+    function openRegionSelectorModal() {
+      alert("다카마쓰, 마쓰야마, 가나자와 중 원하시는 메인 소도시를 홈화면 그리드에서 골라주시면 실시간 패키지 정산이 가능합니다!");
+    }
+
+    function gpsReset() {
+      alert("현재 계획 중인 일본 동선 루트 요금이 기준지로 정상 리로드되었습니다. 🌱");
+    }
+  </script>
 </body>
 </html>
