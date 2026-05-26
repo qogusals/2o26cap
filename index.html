@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>패스패스 - 봄날의 소도시 교통 정산 AI 웹서비스</title>
+  <title>패스패스 - 일본 소도시 교통 정산 웹서비스</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts (Noto Sans KR) -->
@@ -11,7 +11,7 @@
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background-color: #ffffff; /* 배경은 반드시 흰색 */
+      background-color: #ffffff;
     }
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
@@ -26,55 +26,48 @@
     .custom-scroll::-webkit-scrollbar-thumb:hover {
       background: #306D29;
     }
-    @keyframes pulse-slow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.05); }
-    }
-    .pulse-marker {
-      animation: pulse-slow 2s infinite ease-in-out;
-    }
   </style>
 </head>
 <body class="min-h-screen bg-white text-black flex flex-col justify-between">
 
   <!-- ==========================================
-      1. RESPONSIVE WEB HEADER (상단 글로벌 네비게이션)
+      1. HEADER (상단 네비게이션)
      ========================================== -->
   <header class="sticky top-0 z-40 bg-white border-b border-[#E7E1B1] px-6 py-4 shadow-xs">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
       
-      <!-- 서비스 브랜드 로고 -->
-      <div onclick="changeTab('home')" class="flex items-center gap-3 cursor-pointer active-scale">
+      <!-- 로고 (클릭 시 홈화면으로 이동) -->
+      <div onclick="changeTab('home')" class="flex items-center gap-3 cursor-pointer active-scale select-none hover:opacity-90 transition">
         <div class="w-10 h-10 rounded-xl bg-[#0D530E] flex items-center justify-center text-white font-black text-xl shadow-md">
           🎫
         </div>
         <div>
           <h1 class="font-extrabold text-xl text-black tracking-tight leading-none">패스패스</h1>
-          <span class="text-[10px] text-[#306D29] font-black tracking-wide uppercase">Spring Pass AI Optimizer</span>
+          <span class="text-[10px] text-[#306D29] font-black tracking-wide uppercase">Spring Pass Optimizer</span>
         </div>
       </div>
 
-      <!-- 통합 검색창 및 보조 컨트롤러 -->
-      <div class="flex-1 max-w-md w-full relative sm:mx-6">
+      <!-- 보조 검색 바 -->
+      <div class="flex-1 max-w-sm w-full relative sm:mx-6">
         <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-black text-sm">🔍</span>
-        <input type="text" placeholder="일본 소도시 여행지나 교통 패스를 입력해 보세요!" class="w-full bg-[#FBF5DD]/50 rounded-full pl-9 pr-4 py-2 text-xs focus:outline-hidden focus:bg-[#FBF5DD] border border-[#E7E1B1] text-black font-semibold">
+        <input type="text" placeholder="일본 소도시를 입력해 보세요!" class="w-full bg-[#FBF5DD]/50 rounded-full pl-9 pr-4 py-1.5 text-xs focus:outline-hidden focus:bg-[#FBF5DD] border border-[#E7E1B1] text-black font-semibold">
       </div>
 
-      <!-- 우측 데스크톱 네비게이션 버튼 (글씨 검은색) -->
-      <nav class="flex items-center gap-2">
-        <button id="nav-btn-home" onclick="changeTab('home')" class="px-4 py-2 rounded-lg text-xs font-black transition text-[#0D530E] bg-[#FBF5DD]">
+      <!-- 네비게이션 버튼 -->
+      <nav class="flex items-center gap-1.5">
+        <button id="nav-btn-home" onclick="changeTab('home')" class="px-3.5 py-1.5 rounded-lg text-xs font-black transition text-[#0D530E] bg-[#FBF5DD]">
           🏠 홈
         </button>
-        <button id="nav-btn-planner" onclick="changeTab('planner')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
+        <button id="nav-btn-planner" onclick="changeTab('planner')" class="px-3.5 py-1.5 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
           🗺️ 내 플래너
         </button>
-        <button id="nav-btn-saved" onclick="changeTab('saved')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
+        <button id="nav-btn-saved" onclick="changeTab('saved')" class="px-3.5 py-1.5 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
           🔖 보관함
         </button>
-        <button id="nav-btn-result" onclick="changeTab('result')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD] hidden">
+        <button id="nav-btn-result" onclick="changeTab('result')" class="px-3.5 py-1.5 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD] hidden">
           💳 실시간 정산
         </button>
-        <button id="nav-btn-my" onclick="changeTab('my')" class="px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
+        <button id="nav-btn-my" onclick="changeTab('my')" class="px-3.5 py-1.5 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]">
           👤 마이
         </button>
       </nav>
@@ -85,311 +78,262 @@
   <!-- ==========================================
       2. MAIN CONTENT WRAPPER
      ========================================== -->
-  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 bg-white">
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-6 bg-white">
 
     <!-- ==========================================
-        TAB 1: WEB HOME (메인 와이드 화면)
+        TAB 1: WEB HOME
        ========================================== -->
-    <section id="sheet-home" class="space-y-12">
+    <section id="sheet-home" class="space-y-10">
       
-      <!-- 데스크톱 와이드 프로모션 배너 (햇살 미색 #FBF5DD) -->
-      <div class="relative overflow-hidden rounded-3xl bg-[#FBF5DD] p-8 md:p-12 text-black border border-[#E7E1B1] shadow-xs flex flex-col md:flex-row justify-between items-center gap-8">
-        <div class="space-y-4 max-w-2xl z-10">
+      <!-- 데스크톱 와이드 프로모션 배너 -->
+      <div class="relative overflow-hidden rounded-3xl bg-[#FBF5DD] p-8 md:p-10 text-black border border-[#E7E1B1] shadow-xs flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="space-y-3 max-w-2xl z-10">
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#306D29] text-white text-[10px] font-black">
             🌱 SPRING EDITION
           </span>
-          <h2 class="text-3xl md:text-4xl font-black text-black leading-tight">
-            새싹 돋아나는 날의 일본 소도시 여행,<br>
-            <span class="text-[#0D530E]">교통비와 패스의 명쾌한 해답을 찾다</span>
+          <h2 class="text-2xl md:text-3xl font-black text-black leading-tight">
+            봄날의 일본 소도시 자유여행,<br>
+            <span class="text-[#0D530E]">내 동선에 딱 맞는 교통 패스는?</span>
           </h2>
-          <p class="text-xs md:text-sm text-black font-medium leading-relaxed">
-            다카마쓰, 마쓰야마, 가나자와 등 일본의 감성적인 소도시 여행을 준비 중이신가요? 가고 싶은 루트를 마음껏 나열해 보세요. 복잡하게 얽힌 사철, 전차, 버스 노선을 실시간 대조하여 일반 카드와 패키지 교통패스 중 최적의 가성비 조합을 추천해 드립니다.
+          <p class="text-xs text-black font-semibold leading-relaxed">
+            마쓰야마, 다카마쓰, 구마모토 등 매력적인 10대 소도시의 복잡한 로컬 버스, 지하철 요금을 한 번에 계산해 드립니다. 가고 싶은 구간을 연결해 가성비 패스권과 일반 카드 요금을 즉시 비교해 보세요.
           </p>
-          <div class="pt-2 flex flex-wrap gap-3">
-            <button onclick="selectDestination('takamatsu')" class="px-6 py-3.5 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl font-bold text-xs transition transform active:scale-95 shadow-md">
-              지금 바로 교통비 정산하기 →
-            </button>
-          </div>
         </div>
 
-        <!-- 우측 시뮬레이션 요약 가상 위젯 -->
-        <div class="w-full md:w-80 bg-white border border-[#E7E1B1] rounded-2xl p-6 space-y-4 shadow-sm z-10 shrink-0">
-          <div class="flex justify-between items-center border-b border-[#E7E1B1] pb-3 text-black">
+        <!-- 실시간 정산 요약 가상 위젯 -->
+        <div class="w-full md:w-72 bg-white border border-[#E7E1B1] rounded-2xl p-5 space-y-3 shadow-xs z-10 shrink-0">
+          <div class="flex justify-between items-center border-b border-[#E7E1B1] pb-2 text-black">
             <span class="text-xs font-black">🌱 실시간 가상 정산표</span>
-            <span class="w-2.5 h-2.5 rounded-full bg-[#306D29] animate-pulse"></span>
+            <span class="w-2 h-2 rounded-full bg-[#306D29] animate-pulse"></span>
           </div>
-          <div class="space-y-3 text-xs text-black">
+          <div class="space-y-2 text-xs text-black">
             <div class="flex justify-between">
-              <span class="font-semibold text-slate-500">일반 IC 교통카드 총합</span>
+              <span class="font-semibold text-slate-500">일반 카드 개별 이용</span>
               <span class="line-through text-slate-400">¥15,400</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="font-bold text-slate-600">추천 소도시 레일패스</span>
-              <span class="font-black text-[#0D530E] text-sm">¥13,000</span>
+              <span class="font-bold text-slate-600">추천 소도시 패스</span>
+              <span class="font-black text-[#0D530E]">¥13,000</span>
             </div>
-            <div class="h-[1px] bg-[#E7E1B1] my-1"></div>
-            <div class="p-3 bg-[#FBF5DD] border border-[#E7E1B1] rounded-lg text-black text-center font-black">
-              🎁 교통비 단번에 ¥2,400 절약 완료!
+            <div class="p-2 bg-[#FBF5DD] border border-[#E7E1B1] rounded-lg text-black text-center font-black text-[11px]">
+              🎁 교통비 단번에 ¥2,400 세이브 완료!
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 섹션 1: 어디로 가시나요? 일본 소도시 리스트 (데스크톱 와이드 카드 그리드) -->
-      <div class="space-y-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div>
-            <h3 class="text-xl font-black text-black">가고 싶은 봄날의 소도시를 선택해 보세요</h3>
-            <p class="text-xs text-slate-500 mt-1">지역을 정하시면 가상 노선도와 주요 관광 거점 프리셋 일정을 설계기에 자동 셋팅해 드립니다.</p>
-          </div>
-          <div class="flex items-center gap-2 bg-[#FBF5DD] px-3 py-1.5 rounded-lg border border-[#E7E1B1]">
-            <span class="text-xs font-black text-black">📍 추천 소도시 지도 연동 중</span>
-          </div>
+      <!-- 10대 고정 소도시 선택리스트 그리드 -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-lg font-black text-black">설정 가능한 10대 대표 소도시</h3>
+          <p class="text-xs text-slate-500 mt-1">원하시는 도시를 선택해 플래너에 경로를 즉시 로딩해 보세요.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
           
-          <!-- 다카마쓰 카드 -->
-          <div onclick="selectDestination('takamatsu')" class="group relative bg-white border border-[#E7E1B1] rounded-2xl p-6 hover:border-[#0D530E] hover:shadow-lg transition duration-300 cursor-pointer flex flex-col justify-between">
-            <div class="space-y-3">
-              <div class="flex justify-between items-start">
-                <span class="text-3xl p-2 bg-[#FBF5DD] rounded-xl border border-[#E7E1B1]/40">🍜</span>
-                <span class="text-[10px] bg-[#0D530E] text-white px-2.5 py-1 rounded-md font-bold">Kagawa</span>
-              </div>
-              <div>
-                <h4 class="font-black text-base text-black group-hover:text-[#0D530E] transition">다카마쓰 (시코쿠)</h4>
-                <p class="text-xs text-slate-400 mt-0.5">高松 / 우동과 현대 예술의 낭만</p>
-              </div>
-              <p class="text-xs text-slate-500 leading-relaxed">바다와 우동, 그리고 벚꽃이 핀 정원을 가로지르는 고토덴 열차를 만나는 조용하고 따스한 소도시 여정.</p>
-            </div>
-            <div class="border-t border-slate-100 mt-6 pt-4 flex justify-between items-center text-xs text-slate-400">
-              <span class="text-black font-semibold">핵심 거점 5곳 제공</span>
-              <span class="text-[#0D530E] group-hover:translate-x-1 transition font-bold">노선 설계기 이동 →</span>
+          <div onclick="selectDestination('matsuyama')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">♨️</span>
+            <div>
+              <p class="text-xs font-black text-black">마쓰야마</p>
+              <p class="text-[10px] text-slate-400">에히메현</p>
             </div>
           </div>
 
-          <!-- 마쓰야마 카드 -->
-          <div onclick="selectDestination('matsuyama')" class="group relative bg-white border border-[#E7E1B1] rounded-2xl p-6 hover:border-[#0D530E] hover:shadow-lg transition duration-300 cursor-pointer flex flex-col justify-between">
-            <div class="space-y-3">
-              <div class="flex justify-between items-start">
-                <span class="text-3xl p-2 bg-[#FBF5DD] rounded-xl border border-[#E7E1B1]/40">♨️</span>
-                <span class="text-[10px] bg-[#306D29] text-white px-2.5 py-1 rounded-md font-bold">Ehime</span>
-              </div>
-              <div>
-                <h4 class="font-black text-base text-black group-hover:text-[#0D530E] transition">마쓰야마 (에히메)</h4>
-                <p class="text-xs text-slate-400 mt-0.5">松山 / 온천과 클래식 노면전차</p>
-              </div>
-              <p class="text-xs text-slate-500 leading-relaxed">센과 치히로의 모티브가 된 도고 온천과 레트로 봇짱 열차가 유유히 도시 중심을 달리는 편안한 힐링 테마지.</p>
-            </div>
-            <div class="border-t border-slate-100 mt-6 pt-4 flex justify-between items-center text-xs text-slate-400">
-              <span class="text-black font-semibold">핵심 거점 5곳 제공</span>
-              <span class="text-[#0D530E] group-hover:translate-x-1 transition font-bold">노선 설계기 이동 →</span>
+          <div onclick="selectDestination('hiroshima')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">⛩️</span>
+            <div>
+              <p class="text-xs font-black text-black">히로시마</p>
+              <p class="text-[10px] text-slate-400">히로시마현</p>
             </div>
           </div>
 
-          <!-- 가나자와 카드 -->
-          <div onclick="selectDestination('kanazawa')" class="group relative bg-white border border-[#E7E1B1] rounded-2xl p-6 hover:border-[#0D530E] hover:shadow-lg transition duration-300 cursor-pointer flex flex-col justify-between">
-            <div class="space-y-3">
-              <div class="flex justify-between items-start">
-                <span class="text-3xl p-2 bg-[#FBF5DD] rounded-xl border border-[#E7E1B1]/40">🎎</span>
-                <span class="text-[10px] bg-slate-900 text-white px-2.5 py-1 rounded-md font-bold">Ishikawa</span>
-              </div>
-              <div>
-                <h4 class="font-black text-base text-black group-hover:text-[#0D530E] transition">가나자와 (호쿠리쿠)</h4>
-                <p class="text-xs text-slate-400 mt-0.5">金沢 / 에도시대 성곽과 현대미술</p>
-              </div>
-              <p class="text-xs text-slate-500 leading-relaxed">아름다운 겐로쿠엔 정원의 자연 경치와 21세기 현대 미술관이 선사하는 전통과 예술의 완벽한 하모니.</p>
+          <div onclick="selectDestination('takamatsu')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🍜</span>
+            <div>
+              <p class="text-xs font-black text-black">다카마쓰</p>
+              <p class="text-[10px] text-slate-400">카가와현</p>
             </div>
-            <div class="border-t border-slate-100 mt-6 pt-4 flex justify-between items-center text-xs text-slate-400">
-              <span class="text-black font-semibold">핵심 거점 5곳 제공</span>
-              <span class="text-[#0D530E] group-hover:translate-x-1 transition font-bold">노선 설계기 이동 →</span>
+          </div>
+
+          <div onclick="selectDestination('kumamoto')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🐻</span>
+            <div>
+              <p class="text-xs font-black text-black">구마모토</p>
+              <p class="text-[10px] text-slate-400">구마모토현</p>
+            </div>
+          </div>
+
+          <div onclick="selectDestination('miyakojima')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🏖️</span>
+            <div>
+              <p class="text-xs font-black text-black">미야코지마</p>
+              <p class="text-[10px] text-slate-400">오키나와현</p>
+            </div>
+          </div>
+
+          <div onclick="selectDestination('kanazawa')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🎎</span>
+            <div>
+              <p class="text-xs font-black text-black">가나자와</p>
+              <p class="text-[10px] text-slate-400">이시카와현</p>
+            </div>
+          </div>
+
+          <div onclick="selectDestination('kitakyushu')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🏯</span>
+            <div>
+              <p class="text-xs font-black text-black">기타큐슈</p>
+              <p class="text-[10px] text-slate-400">후쿠오카현</p>
+            </div>
+          </div>
+
+          <div onclick="selectDestination('yonago')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🐪</span>
+            <div>
+              <p class="text-xs font-black text-black">요나고</p>
+              <p class="text-[10px] text-slate-400">돗토리현</p>
+            </div>
+          </div>
+
+          <div onclick="selectDestination('kagoshima')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">🌋</span>
+            <div>
+              <p class="text-xs font-black text-black">가고시마</p>
+              <p class="text-[10px] text-slate-400">가고시마현</p>
+            </div>
+          </div>
+
+          <div onclick="selectDestination('beppu')" class="p-4 bg-white border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] hover:shadow-md transition cursor-pointer text-center space-y-2">
+            <span class="text-2xl">♨️</span>
+            <div>
+              <p class="text-xs font-black text-black">벳푸</p>
+              <p class="text-[10px] text-slate-400">오이타현</p>
             </div>
           </div>
 
         </div>
-      </div>
-
-      <!-- 섹션 2: 교통패스 종류별 BEST 테마 리스트 -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        <!-- 봄맞이 교통패스 카테고리 -->
-        <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4">
-          <h4 class="text-base font-black text-black">봄맞이 일본 철도 교통패스 BEST</h4>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
-              <span class="text-2xl">🚢</span>
-              <div>
-                <p class="text-xs font-black text-black">올 시코쿠 레일패스</p>
-                <p class="text-[10px] text-slate-500">시코쿠 6개 전철 무료 커버</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
-              <span class="text-2xl">🚃</span>
-              <div>
-                <p class="text-xs font-black text-black">도쿄 메트로 프리패스</p>
-                <p class="text-[10px] text-slate-500">지하철 1~3일 무제한 탑승</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
-              <span class="text-2xl">🚌</span>
-              <div>
-                <p class="text-xs font-black text-black">간사이 쓰루패스</p>
-                <p class="text-[10px] text-slate-500">간사이권 사철/버스 연계 최강</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 p-3 bg-[#FBF5DD]/40 border border-[#E7E1B1] rounded-xl cursor-pointer hover:border-[#0D530E] transition">
-              <span class="text-2xl">🚅</span>
-              <div>
-                <p class="text-xs font-black text-black">JR 전국 패스</p>
-                <p class="text-[10px] text-slate-500">신칸센 고속 이동 정밀 커버</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 상황별 인기 테마 추천 동선 -->
-        <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4">
-          <h4 class="text-base font-black text-black">AI 추천 푸릇푸릇 기획 테마 코스</h4>
-          
-          <div class="space-y-3">
-            <div onclick="selectDestination('takamatsu')" class="flex gap-4 p-3 bg-white rounded-xl border border-[#E7E1B1] cursor-pointer hover:border-[#0D530E] transition">
-              <span class="text-3xl p-2 bg-[#FBF5DD] rounded-lg border border-[#E7E1B1]/40 flex items-center">🍜</span>
-              <div>
-                <h5 class="text-xs font-bold text-black">식도락 사누키 우동 3일 투어</h5>
-                <p class="text-[10px] text-slate-500 mt-0.5">다카마쓰 우동 택시 버스와 리쓰린 공원 봄전차를 믹싱한 최대 혜택 정산 루트</p>
-                <span class="text-[9px] text-[#0D530E] font-black mt-1 inline-block">🌱 AI 매칭지수 98%</span>
-              </div>
-            </div>
-
-            <div onclick="selectDestination('matsuyama')" class="flex gap-4 p-3 bg-white rounded-xl border border-[#E7E1B1] cursor-pointer hover:border-[#0D530E] transition">
-              <span class="text-3xl p-2 bg-[#FBF5DD] rounded-lg border border-[#E7E1B1]/40 flex items-center">♨️</span>
-              <div>
-                <h5 class="text-xs font-bold text-black">도고온천 레트로 전차 낭만 기행</h5>
-                <p class="text-[10px] text-slate-500 mt-0.5">도고 온천 본관과 마쓰야마성 노면 전차 및 성곽 주변 철도 교통 프리 드로잉 동선</p>
-                <span class="text-[9px] text-[#306D29] font-black mt-1 inline-block">🌿 추천 누적 이용자 1.4만 명</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
     </section>
 
     <!-- ==========================================
-        TAB 2: PLANNER SHEET (동선 설계기 - 데스크톱 분할 배치)
+        TAB 2: PLANNER SHEET (동선 설계 및 구글 맵스 직접 연동)
        ========================================== -->
     <section id="tab-planner" class="space-y-6 hidden">
       
-      <!-- 상단 컨트롤러 및 타이틀 -->
+      <!-- 상단 네비 -->
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#E7E1B1] pb-4">
         <div>
-          <h3 class="text-2xl font-black text-black flex items-center gap-2">
+          <h3 class="text-xl font-black text-black flex items-center gap-2">
             🧭 <span id="planner-region-name" class="text-[#0D530E]">다카마쓰</span> 여행 코스 설계기
           </h3>
-          <p class="text-xs text-slate-500 mt-1">거치고 싶은 핵심 명소와 이동수단을 우측에 등록해 주세요. 실시간 AI가 구간별 요금을 수렴합니다.</p>
+          <p class="text-xs text-slate-500 mt-1">거치고 싶은 핵심 명소를 직접 검색하여 추가해 주세요. 구글 지도가 실시간 연동됩니다.</p>
         </div>
         
         <div class="flex gap-2 w-full md:w-auto">
           <select id="region-selector" onchange="onRegionSelectorChange(this.value)" class="bg-white border border-[#E7E1B1] px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-[#0D530E] focus:outline-hidden">
-            <option value="takamatsu">다카마쓰 (시코쿠)</option>
             <option value="matsuyama">마쓰야마 (에히메)</option>
+            <option value="hiroshima">히로시마</option>
+            <option value="takamatsu">다카마쓰 (시코쿠)</option>
+            <option value="kumamoto">구마모토</option>
+            <option value="miyakojima">미야코지마</option>
             <option value="kanazawa">가나자와 (호쿠리쿠)</option>
+            <option value="kitakyushu">기타큐슈</option>
+            <option value="yonago">요나고</option>
+            <option value="kagoshima">가고시마</option>
+            <option value="beppu">벳푸</option>
           </select>
-          <button onclick="restorePreset()" class="px-4 py-1.5 bg-[#FBF5DD] border border-[#E7E1B1] hover:bg-[#E7E1B1] text-black rounded-lg text-xs font-bold transition">
-            기본 추천코스 복원
+          <button onclick="restorePreset()" class="px-3.5 py-1.5 bg-[#FBF5DD] border border-[#E7E1B1] hover:bg-[#E7E1B1] text-black rounded-lg text-xs font-bold transition">
+            전체 초기화
           </button>
         </div>
       </div>
 
-      <!-- 양대 칼럼 가로 분할 레이아웃 -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- 양대 칼럼 가로 배치 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left Column: 일정 제어창 및 선택 입력기 (7/12) -->
-        <div class="lg:col-span-7 space-y-6">
+        <!-- Left Column: 일정 제어창 (7/12) -->
+        <div class="lg:col-span-7 space-y-5">
           
-          <!-- 구간 추가 폼 카드 (#FBF5DD) -->
-          <div class="bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-6 space-y-4 shadow-xs">
-            <span class="text-xs font-black text-[#0D530E] flex items-center gap-1.5">🌱 새로운 이동 구간 동선 등록</span>
+          <!-- 구간 추가 폼 (직접 검색 입력창) -->
+          <div class="bg-[#FBF5DD] border border-[#E7E1B1] rounded-2xl p-5 space-y-3.5 shadow-xs">
+            <span class="text-xs font-black text-[#0D530E] flex items-center gap-1.5">🌱 이동 구간 직접 검색 및 추가</span>
             
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label class="block text-[10px] text-black font-bold mb-1">출발지 거점</label>
-                <select id="input-from" class="w-full bg-white border border-[#E7E1B1] px-3 py-2 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]"></select>
+                <!-- 사용자가 직접 입력 가능. 입력 후 포커스를 잃으면(onblur) 지도가 갱신됨 -->
+                <input type="text" id="input-from" placeholder="예) 다카마쓰 공항" onblur="updateLiveMap()" class="w-full bg-white border border-[#E7E1B1] px-3 py-1.5 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]">
               </div>
               <div>
                 <label class="block text-[10px] text-black font-bold mb-1">도착지 거점</label>
-                <select id="input-to" class="w-full bg-white border border-[#E7E1B1] px-3 py-2 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]"></select>
+                <input type="text" id="input-to" placeholder="검색할 명소를 입력하세요" onblur="updateLiveMap()" class="w-full bg-white border border-[#E7E1B1] px-3 py-1.5 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]">
               </div>
               <div>
                 <label class="block text-[10px] text-black font-bold mb-1">이동 수단</label>
-                <select id="input-type" class="w-full bg-white border border-[#E7E1B1] px-3 py-2 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]">
-                  <option value="Train">전차 / 로컬 지하철 🚃</option>
+                <select id="input-type" class="w-full bg-white border border-[#E7E1B1] px-2 py-1.5 rounded-lg text-xs text-black font-semibold focus:outline-hidden focus:ring-1 focus:ring-[#0D530E]">
+                  <option value="Train">전차 / 지하철 🚃</option>
                   <option value="Bus">버스 / 공항 리무진 🚌</option>
-                  <option value="Tram">감성 노면 전차 🚋</option>
-                  <option value="Ferry">페리 / 연안 쾌속 배 🚢</option>
-                  <option value="Walk">도보 및 길목 걷기 🚶</option>
+                  <option value="Tram">노면 전차 🚋</option>
+                  <option value="Ferry">페리 / 고속 배 🚢</option>
+                  <option value="Walk">도보 🚶</option>
                 </select>
               </div>
             </div>
 
-            <button onclick="addSegmentToItinerary()" class="w-full py-3 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl text-xs font-black shadow-md transition transform active:scale-98">
-              선택한 이동 구간 리스트에 추가하기 🌿
+            <button onclick="addSegmentToItinerary()" class="w-full py-2.5 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl text-xs font-black shadow-xs transition transform active:scale-98">
+              동선 일정에 추가하기
             </button>
           </div>
 
-          <!-- 등록 일정 리스트 및 분석 실행 보드 -->
-          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4 shadow-xs">
+          <!-- 일정 리스트 보드 -->
+          <div class="bg-white border border-[#E7E1B1] rounded-2xl p-5 space-y-3.5 shadow-xs">
             <div class="flex justify-between items-center">
-              <span class="text-sm font-black text-black">내가 설계한 정산 대상 루트 (<span id="itinerary-size" class="text-[#0D530E]">0</span>개)</span>
-              <button onclick="clearItineraryList()" class="text-xs text-black font-bold hover:text-rose-600 underline">전체 비우기</button>
+              <span class="text-xs font-black text-black">정산 대상 루트 (<span id="itinerary-size" class="text-[#0D530E]">0</span>개)</span>
             </div>
 
-            <!-- 스크롤 일정 구간 컨테이너 -->
-            <div id="itinerary-list" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 custom-scroll">
-              <!-- JS 로드 영역 -->
+            <!-- 스크롤 리스트 -->
+            <div id="itinerary-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scroll">
+              <!-- JS 동적 렌더링 -->
             </div>
 
-            <!-- 분석 실행 버튼 영역 -->
-            <div id="btn-analysis-container" class="pt-2">
-              <button onclick="runAnalysis()" class="w-full py-4 bg-slate-900 hover:bg-[#0D530E] text-white rounded-2xl text-sm font-black shadow-lg shadow-slate-900/10 transition transform active:scale-98">
-                🪄 실시간 인공지능 요금 비교 엔진 작동하기
+            <!-- 정산 분석기 버튼 -->
+            <div id="btn-analysis-container" class="pt-1">
+              <button onclick="runAnalysis()" class="w-full py-3.5 bg-slate-900 hover:bg-[#0D530E] text-white rounded-xl text-xs font-black transition">
+                🚀 실시간 최적 교통 패스 정산하기
               </button>
             </div>
           </div>
 
         </div>
 
-        <!-- Right Column: 가상 노선 맵 및 안내창 (5/12) -->
+        <!-- Right Column: 구글 맵스 보기 (5/12) -->
         <div class="lg:col-span-5">
-          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 space-y-4 h-full flex flex-col justify-between">
+          <div class="bg-white border border-[#E7E1B1] rounded-2xl p-5 h-full flex flex-col justify-between">
             <div>
-              <h4 class="text-sm font-black text-black flex items-center gap-1.5">
-                <span class="text-rose-500">📍</span> 소도시 시각 가상 노선 맵
+              <h4 class="text-xs font-black text-black flex items-center gap-1.5">
+                <span class="text-rose-500">📍</span> 지도 보기
               </h4>
-              <p class="text-[11px] text-slate-500 mt-1">내가 선택한 관광 루트가 아래 맵에 실시간 드로잉 라인으로 구축됩니다.</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">검색하신 장소의 실제 구글 맵입니다. 입력에 맞춰 실시간 연동됩니다.</p>
             </div>
 
-            <!-- SVG 맵 캔버스 영역 -->
-            <div id="map-wrap" class="relative w-full aspect-square bg-[#0D530E] rounded-2xl overflow-hidden border border-[#E7E1B1] shadow-inner flex items-center justify-center my-4">
-              <div class="absolute inset-0 bg-[linear-gradient(to_right,#306D29_1px,transparent_1px),linear-gradient(to_bottom,#306D29_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-35"></div>
-              
-              <svg id="svg-map" class="absolute inset-0 w-full h-full" viewBox="0 0 100 100"></svg>
-              
-              <!-- 동적 라벨 컨테이너 -->
-              <div id="map-labels-container" class="absolute inset-0 pointer-events-none text-[8px]"></div>
+            <!-- Google Maps Embed Container -->
+            <div class="relative w-full aspect-square bg-[#FBF5DD] rounded-xl overflow-hidden border border-[#E7E1B1] my-4 shadow-inner">
+              <iframe 
+                id="google-maps-iframe"
+                class="absolute inset-0 w-full h-full border-0"
+                src="about:blank"
+                allowfullscreen="" 
+                loading="lazy">
+              </iframe>
             </div>
 
-            <div class="bg-[#FBF5DD] p-4 rounded-xl border border-[#E7E1B1] text-xs text-black space-y-1.5">
+            <div class="bg-[#FBF5DD] p-3 rounded-xl border border-[#E7E1B1] text-[10px] text-black space-y-1">
               <div class="flex items-center gap-1.5 font-bold">
-                <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
-                <span>내가 선택한 주요 관광/철도 거점</span>
+                <span class="w-2 h-2 rounded-full bg-[#0D530E]"></span>
+                <span>실제 소도시 지도 매칭 완료</span>
               </div>
-              <div class="flex items-center gap-1.5 font-bold">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#306D29]"></span>
-                <span>미연결된 지역 예비 거점</span>
-              </div>
+              <p class="text-[9px] text-slate-500">명칭 검색 시 도시명을 함께 입력하면 더 정확하게 표시됩니다.</p>
             </div>
           </div>
         </div>
@@ -399,320 +343,301 @@
     </section>
 
     <!-- ==========================================
-        TAB 3: RESULT SHEET (실시간 정산 비교 와이드 대시보드)
+        TAB 3: RESULT SHEET (정산 완료 리포트 및 지도결합)
        ========================================== -->
-    <section id="sheet-result" class="space-y-8 hidden">
+    <section id="sheet-result" class="space-y-6 hidden">
       
-      <!-- 데스크톱용 절약 요약 상단 띠 배너 -->
-      <div id="result-badge-ribbon" class="p-8 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-6 bg-gradient-to-r from-[#0D530E] to-[#306D29]">
+      <!-- 상단 리포트 요약 띠 (깔끔한 문구) -->
+      <div id="result-badge-ribbon" class="p-6 rounded-2xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-4 bg-gradient-to-r from-[#0D530E] to-[#306D29]">
         <div class="space-y-1 text-center sm:text-left">
-          <span class="text-[10px] font-black uppercase bg-white/20 px-3 py-1 rounded-full">AI OPTIMIZE REPORT</span>
-          <h3 id="result-main-title" class="text-2xl font-black mt-2">패스 구매가 훨씬 합리적인 코스입니다!</h3>
-          <p id="result-sub-title" class="text-xs text-white/80 mt-1">AI 솔루션 제안: 올 시코쿠 레일패스 3일권</p>
+          <span class="text-[10px] font-black uppercase bg-white/20 px-2.5 py-0.5 rounded-full">교통비 정산 분석 리포트</span>
+          <h3 id="result-main-title" class="text-xl font-black mt-1">패스 구매가 이득인 동선입니다!</h3>
+          <p id="result-sub-title" class="text-xs text-white/80">추천 패스권: 올 시코쿠 레일패스 3일권</p>
         </div>
 
         <div class="text-center sm:text-right shrink-0">
-          <span class="text-xs text-white/70 font-bold block">AI 예상 세이브 비용</span>
-          <p id="result-savings-display" class="text-4xl font-black text-amber-300 mt-1">+ ¥2,400</p>
+          <span class="text-xs text-white/70 font-bold block">정산 절약 예상 비용</span>
+          <p id="result-savings-display" class="text-2xl font-black text-amber-300">+ ¥2,400</p>
         </div>
       </div>
 
-      <!-- 메인 정산 정보 대조 보드 -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- 정산 정보 메인 대조 보드 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left: 비교 정산 바 차트 및 지표 (7/12) -->
-        <div class="lg:col-span-7 space-y-6">
-          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 shadow-xs space-y-6">
-            <h4 class="text-sm font-black text-black">📊 대중교통 패스 vs 개별 교통카드 일괄 정산액</h4>
+        <!-- Left: 전체 지도 및 대조 그래프 영역 -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- 전체 루트 구글 맵스 보기 -->
+          <div class="bg-white border border-[#E7E1B1] rounded-2xl p-5 shadow-xs h-[300px] flex flex-col">
+            <h4 class="text-xs font-black text-black mb-2 flex items-center gap-1.5">
+              <span class="text-rose-500">🗺️</span> 전체 동선 지도 보기
+            </h4>
+            <div class="flex-1 rounded-xl overflow-hidden border border-[#E7E1B1] relative bg-[#FBF5DD]">
+              <iframe 
+                id="result-google-maps-iframe"
+                class="absolute inset-0 w-full h-full border-0"
+                src="about:blank"
+                allowfullscreen="" 
+                loading="lazy">
+              </iframe>
+            </div>
+          </div>
 
-            <div class="space-y-4">
-              <!-- 일반 IC카드 금액 막대 -->
+          <div class="bg-white border border-[#E7E1B1] rounded-2xl p-5 shadow-xs space-y-4">
+            <h4 class="text-xs font-black text-black">📊 대중교통 패스 vs 개별 교통카드 정산액</h4>
+
+            <div class="space-y-3">
               <div class="space-y-1">
                 <div class="flex justify-between text-xs font-bold text-black">
-                  <span>일반 IC 교통카드 개별 지불 총액</span>
+                  <span>일반 교통카드 개별 지불 총액</span>
                   <span id="ic-price-total" class="font-black">¥15,400</span>
                 </div>
-                <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden border border-[#E7E1B1]">
+                <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden border border-[#E7E1B1]">
                   <div id="bar-ic-price" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 100%;"></div>
                 </div>
               </div>
 
-              <!-- 패스 패키지 금액 막대 -->
               <div class="space-y-1">
                 <div class="flex justify-between text-xs font-bold text-black">
-                  <span>추천 패키지 교통패스권 + 비적용구역 요금</span>
+                  <span>추천 패키지 + 비적용 노선 요금</span>
                   <span id="pass-price-total" class="font-black">¥13,000</span>
                 </div>
-                <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden border border-[#E7E1B1]">
+                <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden border border-[#E7E1B1]">
                   <div id="bar-pass-price" class="bg-[#306D29] h-full rounded-full transition-all duration-1000" style="width: 80%;"></div>
                 </div>
               </div>
             </div>
 
             <!-- 디테일 요금 대조 테이블 -->
-            <div class="bg-[#FBF5DD]/50 border border-[#E7E1B1] rounded-2xl p-5 text-xs space-y-3">
+            <div class="bg-[#FBF5DD]/50 border border-[#E7E1B1] rounded-xl p-4 text-xs space-y-2 mt-4">
               <div class="flex justify-between text-black font-semibold">
                 <span>추천 소도시 교통 패키지 가격</span>
                 <span id="detail-base-price" class="font-bold">¥13,000</span>
               </div>
               <div class="flex justify-between text-black font-semibold">
-                <span>패스 불포함 버스/페리 등 현장 추가 과금액</span>
+                <span>패스 불포함구역 현장 결제분</span>
                 <span id="detail-extra-price" class="text-rose-600 font-bold">+ ¥0</span>
               </div>
               <div class="h-[1px] bg-[#E7E1B1] my-1"></div>
-              <div class="flex justify-between font-black text-black text-sm">
-                <span>최종 교통 실부담 총 합계</span>
+              <div class="flex justify-between font-black text-black">
+                <span>최종 교통 실부담 합계</span>
                 <span id="detail-total-price">¥13,000</span>
               </div>
             </div>
           </div>
-
-          <!-- AI 지능형 코치 어드바이스 -->
-          <div class="bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-6 space-y-3">
-            <h4 class="text-sm font-black text-[#0D530E] flex items-center gap-1.5">
-              <span class="text-lg">🌿</span> AI 봄맞이 소도시 여행 정산 코치 리포트
-            </h4>
-            <p id="ai-report-box" class="text-xs text-black font-medium leading-relaxed">
-              공항버스는 시코쿠 패스 적용 대상이나, 터미널 교환 창구에서 지정석 표를 사전에 교환받으셔야 합니다.
-            </p>
-          </div>
         </div>
 
-        <!-- Right: 개별 영수증 및 제휴 링크 (5/12) -->
-        <div class="lg:col-span-5 space-y-6">
-          <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 shadow-xs space-y-4">
-            <h4 class="text-sm font-black text-black">🔍 구간별 상세 요금 정산서</h4>
+        <!-- Right: 청구 영수증 및 구매 버튼 -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <div class="bg-white border border-[#E7E1B1] rounded-2xl p-5 shadow-xs space-y-4">
+            <h4 class="text-xs font-black text-black">🔍 세부 노선 정산 영수증</h4>
+            <p class="text-[10px] text-slate-500 leading-tight">어떤 동선에서 비용이 얼마가 소비되는지 확인하세요.</p>
 
             <!-- 영수증 스크롤 영역 -->
-            <div id="receipt-segments-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-1 custom-scroll">
+            <div id="receipt-segments-list" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1 custom-scroll">
               <!-- JS 주입 -->
             </div>
 
-            <!-- 제휴 어필리에이트 버튼 -->
-            <div class="border-t border-[#E7E1B1] pt-4 space-y-3">
-              <p class="text-[10px] text-slate-400 font-semibold text-center">제휴 파트너 최저가 예약 및 링크 공유</p>
-              <div class="grid grid-cols-2 gap-2">
-                <a href="https://www.klook.com" target="_blank" class="py-3 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl text-center font-bold text-xs shadow-md transition active-scale">
-                  🎫 Klook 제휴 할인가 구매
-                </a>
-                <button onclick="shareItinerary()" class="py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-center font-bold text-xs shadow-md transition active-scale">
-                  🔗 동선 일정 공유하기
-                </button>
-              </div>
+            <!-- 어필리에이트 제휴 -->
+            <div class="border-t border-[#E7E1B1] pt-3 mt-2 space-y-2">
+              <a id="btn-klook-link" href="https://www.klook.com" target="_blank" class="block w-full py-3 bg-[#0D530E] hover:bg-[#306D29] text-white rounded-xl text-center font-bold text-xs transition">
+                🎫 Klook 할인 예매 (해당 패스 바로가기)
+              </a>
             </div>
           </div>
+
+          <!-- 현지 가이드 피드백 -->
+          <div class="bg-[#FBF5DD] border border-[#E7E1B1] rounded-2xl p-5 space-y-2">
+            <h4 class="text-xs font-black text-[#0D530E] flex items-center gap-1.5">
+              <span class="text-base">🌿</span> 소도시 현지 탑승 가이드
+            </h4>
+            <p id="local-guide-box" class="text-xs text-black font-semibold leading-relaxed">
+              소도시 운행 노선 팁: 패스를 활용하여 간편하게 탑승하세요!
+            </p>
+          </div>
+
         </div>
 
       </div>
 
-      <!-- 정산 후 리셋 보정 인터랙션 -->
-      <div class="text-center">
-        <button onclick="changeTab('planner')" class="px-6 py-3 bg-[#FBF5DD] border border-[#E7E1B1] hover:bg-[#E7E1B1] text-black rounded-xl font-bold text-xs transition">
-          ← 일정 동선 보정하러 가기
+      <!-- 보정용 버튼 -->
+      <div class="text-center pt-2">
+        <button onclick="changeTab('planner')" class="px-5 py-2.5 bg-[#FBF5DD] border border-[#E7E1B1] hover:bg-[#E7E1B1] text-black rounded-lg font-bold text-xs transition">
+          ← 일정 추가 및 수정하러 가기
         </button>
       </div>
 
     </section>
 
     <!-- ==========================================
-        TAB 4: SAVED PLANS SHEET (내 보관함)
+        TAB 4: SAVED PLANS SHEET
        ========================================== -->
     <section id="sheet-saved" class="space-y-6 hidden">
       <div>
-        <h3 class="text-xl font-black text-black">보관된 나의 봄철 여정</h3>
-        <p class="text-xs text-slate-500 mt-1">즐겨찾기 하거나 정산 분석에 완료했던 나의 히스토리입니다.</p>
+        <h3 class="text-lg font-black text-black">보관한 봄철 여정</h3>
+        <p class="text-xs text-slate-500 mt-1">이전에 완료했거나 북마크에 추가해 둔 교통비 계산 내역입니다.</p>
       </div>
 
-      <div id="saved-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+      <div id="saved-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
         <!-- JS 로드 -->
       </div>
     </section>
 
     <!-- ==========================================
-        TAB 5: MY PROFILE SHEET (내 정보 관리)
+        TAB 5: MY PROFILE SHEET
        ========================================== -->
     <section id="sheet-my" class="space-y-6 hidden">
-      
-      <div class="flex items-center gap-5 bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-6 max-w-2xl">
-        <div class="w-16 h-16 rounded-full bg-white border border-[#E7E1B1] flex items-center justify-center text-4xl shadow-xs">
+      <div class="flex items-center gap-4 bg-[#FBF5DD] border border-[#E7E1B1] rounded-2xl p-5 max-w-2xl">
+        <div class="w-12 h-12 rounded-full bg-white border border-[#E7E1B1] flex items-center justify-center text-3xl shadow-xs">
           🌱
         </div>
         <div>
-          <span class="text-[9px] bg-[#306D29] text-white px-2 py-0.5 rounded-full font-bold">봄 소도시 마스터</span>
-          <h4 class="text-base font-black text-black mt-1">소도시를 정복하는 파릇파릇 여행자</h4>
-          <p class="text-xs text-slate-500 mt-0.5">회원 가입 일시: 2026.05.26</p>
+          <span class="text-[9px] bg-[#306D29] text-white px-2 py-0.5 rounded-full font-bold">봄 소도시 정복 마스터</span>
+          <h4 class="text-sm font-black text-black mt-1">파릇파릇 일본 탐방 여행자</h4>
+          <p class="text-xs text-slate-400 mt-0.5">가입일: 2026.05.26</p>
         </div>
       </div>
-
-      <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 max-w-2xl space-y-4">
-        <span class="text-xs font-black text-black block">누적 절약 및 분석 이용 현황</span>
-        
-        <div class="grid grid-cols-2 gap-4 text-center">
-          <div class="bg-[#FBF5DD]/50 p-4 rounded-2xl border border-[#E7E1B1]/40">
-            <span class="text-[10px] text-slate-500 font-bold block">정산 요청 수</span>
-            <span class="text-xl font-black text-[#0D530E] mt-1 block">14회</span>
-          </div>
-          <div class="bg-[#FBF5DD]/50 p-4 rounded-2xl border border-[#E7E1B1]/40">
-            <span class="text-[10px] text-slate-500 font-bold block">교통비 절감액</span>
-            <span class="text-xl font-black text-[#306D29] mt-1 block">¥14,200</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 부가 셋팅 리스트 -->
-      <div class="bg-white border border-[#E7E1B1] rounded-3xl p-6 max-w-2xl space-y-1 text-xs text-black">
-        <div class="flex justify-between items-center py-3 border-b border-[#E7E1B1]/30 cursor-pointer hover:bg-[#FBF5DD]/20 px-2 rounded-lg transition active-scale">
-          <span>나의 여행 패스 조건 변경</span>
-          <span>❯</span>
-        </div>
-        <div class="flex justify-between items-center py-3 border-b border-[#E7E1B1]/30 cursor-pointer hover:bg-[#FBF5DD]/20 px-2 rounded-lg transition active-scale">
-          <span>어필리에이트 할인 쿠폰 보관함</span>
-          <span class="text-[#0D530E] font-black">2개 미사용 보관 중</span>
-        </div>
-        <div class="flex justify-between items-center py-3 cursor-pointer hover:bg-[#FBF5DD]/20 px-2 rounded-lg transition active-scale">
-          <span>고객 피드백 & 시스템 건의사항</span>
-          <span>❯</span>
-        </div>
-      </div>
-
     </section>
 
   </main>
 
   <!-- ==========================================
-      3. AI ANALYZER LOADING DIALOG (웹 오버레이)
+      3. LOADING DIALOG
      ========================================== -->
-  <div id="ai-loading-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-6 hidden">
-    <div class="w-full max-w-sm bg-[#FBF5DD] border border-[#E7E1B1] rounded-3xl p-8 text-center space-y-6 shadow-2xl">
-      
-      <!-- 싱그러운 소도시 링 스핀 -->
-      <div class="relative w-20 h-20 mx-auto">
+  <div id="loading-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-6 hidden">
+    <div class="w-full max-w-sm bg-[#FBF5DD] border border-[#E7E1B1] rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+      <div class="relative w-16 h-16 mx-auto">
         <div class="absolute inset-0 rounded-full border-4 border-white"></div>
         <div class="absolute inset-0 rounded-full border-4 border-t-[#0D530E] animate-spin"></div>
-        <div class="absolute inset-0 flex items-center justify-center text-3xl">🌱</div>
+        <div class="absolute inset-0 flex items-center justify-center text-2xl">🌱</div>
       </div>
-
       <div class="space-y-1">
-        <h5 class="text-black font-black text-base text-[#0D530E]">PassPass AI 교통 정산 중</h5>
-        <p id="loading-status" class="text-slate-600 text-xs min-h-[16px] font-semibold">봄 소도시별 철도 가격 대조 중...</p>
+        <h5 class="text-black font-black text-sm text-[#0D530E]">교통 정산 가동 중</h5>
+        <p id="loading-status" class="text-slate-600 text-xs min-h-[16px] font-semibold">소도시 구간 운임 수집 중...</p>
       </div>
-
-      <!-- 프로그레스 바 라인 -->
       <div class="space-y-1">
-        <div class="w-full bg-white h-2 rounded-full overflow-hidden border border-[#E7E1B1]">
+        <div class="w-full bg-white h-1.5 rounded-full overflow-hidden border border-[#E7E1B1]">
           <div id="loading-bar-inner" class="bg-[#306D29] h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
         </div>
-        <div class="flex justify-between text-[10px] font-black text-[#0D530E]">
-          <span>AI SPRING SYSTEM ACT</span>
+        <div class="flex justify-between text-[9px] font-black text-[#0D530E]">
+          <span>SYSTEM CALC</span>
           <span id="loading-percent">10%</span>
         </div>
       </div>
-
     </div>
   </div>
 
   <!-- ==========================================
-      4. WEB FOOTER (하단 가이드라인)
+      4. WEB FOOTER
      ========================================== -->
-  <footer class="bg-slate-950 text-slate-400 text-xs py-10 px-6 border-t border-[#E7E1B1]/20">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-      
+  <footer class="bg-slate-950 text-slate-400 text-xs py-8 px-6 border-t border-[#E7E1B1]/10">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="space-y-1 text-center md:text-left">
         <p class="font-bold text-white flex items-center gap-1.5 justify-center md:justify-start">
           <span class="text-rose-500">🎫</span> 패스패스 (PassPass)
         </p>
-        <p class="text-[10px] text-slate-500">AI 기반 실시간 일본 소도시 대중교통 최적 패키지 정산 분석 서비스</p>
+        <p class="text-[10px] text-slate-500">일본 소도시 대중교통 최적 패키지 정산 분석 서비스</p>
       </div>
-
       <div class="text-center md:text-right text-[10px] text-slate-500 space-y-1">
-        <p>© 2026 PassPass AI. All Rights Reserved.</p>
-        <p>본 결과 산출표는 실제 일본 현지 JR 노선 및 지자체 버스 정기 요금을 바탕으로 추정 정산되며, 시즌 요금 변동에 영향받을 수 있습니다.</p>
+        <p>© 2026 PassPass. All Rights Reserved.</p>
       </div>
-
     </div>
   </footer>
 
   <!-- ==========================================
-      5. JAVASCRIPT LOGIC MATRIX (웹 스크립트 엔진)
+      5. JAVASCRIPT LOGIC ENGINE
      ========================================== -->
   <script>
-    // 소도시 정보 DB
+    // 10대 소도시 데이터베이스 및 클룩(Klook) 연동 URL 포함
     const GEOPASS_DB = {
+      matsuyama: {
+        id: "matsuyama",
+        title: "에히메 / 마쓰야마 ♨️",
+        defaultHub: "마쓰야마 공항",
+        passes: [{ name: "마쓰야마 / 우치코 / 오즈 패스", price: 2500 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=JR%20시코쿠%20패스"
+      },
+      hiroshima: {
+        id: "hiroshima",
+        title: "히로시마 ⛩️",
+        defaultHub: "히로시마 공항",
+        passes: [{ name: "히로시마 투어리스트 패스", price: 2000 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=히로시마%20패스"
+      },
       takamatsu: {
         id: "takamatsu",
         title: "시코쿠 / 다카마쓰 🌿",
-        hubs: [
-          { nameKo: "다카마쓰 공항", x: 50, y: 85 },
-          { nameKo: "다카마쓰역", x: 50, y: 25 },
-          { nameKo: "리쓰린 공원", x: 48, y: 48 },
-          { nameKo: "고토히라역 (고토덴)", x: 25, y: 70 },
-          { nameKo: "쇼도섬 페리 터미널", x: 75, y: 15 }
-        ],
-        preset: [
-          { from: "다카마쓰 공항", to: "다카마쓰역", type: "Bus" },
-          { from: "다카마쓰역", to: "리쓰린 공원", type: "Train" },
-          { from: "리쓰린 공원", to: "고토히라역 (고토덴)", type: "Train" },
-          { from: "다카마쓰역", to: "쇼도섬 페리 터미널", type: "Ferry" }
-        ],
-        passes: [{ name: "올 시코쿠 레일패스 3일권", price: 13000 }]
+        defaultHub: "다카마쓰 공항",
+        passes: [{ name: "올 시코쿠 레일패스 3일권", price: 13000 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=올%20시코쿠%20레일패스"
       },
-      matsuyama: {
-        id: "matsuyama",
-        title: "에히메 / 마쓰야마 🍊",
-        hubs: [
-          { nameKo: "마쓰야마 공항", x: 20, y: 55 },
-          { nameKo: "마쓰야마시역", x: 45, y: 55 },
-          { nameKo: "도고온천역", x: 75, y: 35 },
-          { nameKo: "오즈역 (가류산장)", x: 30, y: 85 },
-          { nameKo: "우치코역", x: 50, y: 80 }
-        ],
-        preset: [
-          { from: "마쓰야마 공항", to: "마쓰야마시역", type: "Bus" },
-          { from: "마쓰야마시역", to: "도고온천역", type: "Tram" },
-          { from: "마쓰야마시역", to: "우치코역", type: "Train" }
-        ],
-        passes: [{ name: "마쓰야마 / 우치코 / 오즈 패스", price: 2500 }]
+      kumamoto: {
+        id: "kumamoto",
+        title: "구마모토 🐻",
+        defaultHub: "구마모토 공항",
+        passes: [{ name: "JR 큐슈 모바일 레일패스", price: 9500 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=JR%20큐슈%20레일패스"
+      },
+      miyakojima: {
+        id: "miyakojima",
+        title: "오키나와 / 미야코지마 🏖️",
+        defaultHub: "미야코 공항",
+        passes: [{ name: "미야코지마 셔틀 올데이 버스패스", price: 2100 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=오키나와%20미야코지마"
       },
       kanazawa: {
         id: "kanazawa",
         title: "호쿠리쿠 / 가나자와 🌸",
-        hubs: [
-          { nameKo: "고마쓰 공항", x: 20, y: 80 },
-          { nameKo: "가나자와역", x: 50, y: 35 },
-          { nameKo: "겐로쿠엔 (겸육원)", x: 60, y: 55 },
-          { nameKo: "21세기 미술관", x: 55, y: 65 },
-          { nameKo: "도야마역", x: 90, y: 20 }
-        ],
-        preset: [
-          { from: "고마쓰 공항", to: "가나자와역", type: "Bus" },
-          { from: "가나자와역", to: "겐로쿠엔 (겸육원)", type: "Bus" },
-          { from: "가나자와역", to: "도야마역", type: "Train" }
-        ],
-        passes: [{ name: "호쿠리쿠 에리어 패스 4일권", price: 5090 }]
+        defaultHub: "고마쓰 공항",
+        passes: [{ name: "호쿠리쿠 에리어 패스 4일권", price: 5090 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=호쿠리쿠%20에리어%20패스"
+      },
+      kitakyushu: {
+        id: "kitakyushu",
+        title: "기타큐슈 🏯",
+        defaultHub: "기타큐슈 공항",
+        passes: [{ name: "기타큐슈 & 웨스트 JR 패스", price: 3500 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=JR%20서일본%20패스"
+      },
+      yonago: {
+        id: "yonago",
+        title: "요나고 🐪",
+        defaultHub: "요나고 공항",
+        passes: [{ name: "돗토리 앤 마쓰에 패스 3일권", price: 4500 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=산인%20오카야마%20패스"
+      },
+      kagoshima: {
+        id: "kagoshima",
+        title: "가고시마 🌋",
+        defaultHub: "가고시마 공항",
+        passes: [{ name: "가고시마 큐트 시티패스 2일권", price: 1800 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=JR%20남큐슈%20패스"
+      },
+      beppu: {
+        id: "beppu",
+        title: "벳푸 ♨️",
+        defaultHub: "오이타 공항",
+        passes: [{ name: "벳푸 미니 와이드 버스 프리패스", price: 1500 }],
+        klookUrl: "https://www.klook.com/ko/search/result/?query=북큐슈%20레일패스"
       }
     };
 
-    // 글로벌 상태
+    // 글로벌 상태 매트릭스
     let state = {
       activeTab: "home",
       currentRegion: GEOPASS_DB.takamatsu,
-      itinerary: [...GEOPASS_DB.takamatsu.preset],
-      savedPlans: [
-        { title: "봄날의 시코쿠 벚꽃 꽃길 루트 🌿", cost: "¥13,000", savings: "¥2,400" },
-        { title: "에히메 싱그러운 온천투어 ♨️", cost: "¥2,500", savings: "¥820" }
-      ]
+      itinerary: []
     };
 
     window.onload = () => {
       changeTab('home');
-      renderSavedPlans();
     };
 
-    // 반응형 탭 전환
+    // 탭 이동 제어
     function changeTab(tabId) {
       state.activeTab = tabId;
 
-      // 시트 제어
       const sheets = ['home', 'planner', 'result', 'saved', 'my'];
       sheets.forEach(s => {
         const sheetNode = document.getElementById(`sheet-${s}`);
@@ -735,81 +660,72 @@
         }
       });
 
-      // 네비게이션 버튼 가시성 하이라이트 제어
+      // 버튼 스타일 하이라이트 제어
       sheets.forEach(s => {
         const btnNode = document.getElementById(`nav-btn-${s}`);
         if (btnNode) {
           if (s === tabId) {
-            btnNode.className = "px-4 py-2 rounded-lg text-xs font-black transition text-[#0D530E] bg-[#FBF5DD]";
+            btnNode.className = "px-3.5 py-1.5 rounded-lg text-xs font-black transition text-[#0D530E] bg-[#FBF5DD]";
           } else {
-            btnNode.className = "px-4 py-2 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]";
+            btnNode.className = "px-3.5 py-1.5 rounded-lg text-xs font-black transition text-black hover:bg-[#FBF5DD]";
           }
         }
       });
     }
 
-    // 소도시 선정 시 플래너 로딩
+    // 소도시 선정 시 데이터 및 구글 맵 주입 (공항 출발 자동 셋팅)
     function selectDestination(regionId) {
       state.currentRegion = GEOPASS_DB[regionId];
-      state.itinerary = [...state.currentRegion.preset];
+      state.itinerary = [];
       
-      document.getElementById('current-region-display').innerText = state.currentRegion.title;
+      document.getElementById('current-region-display') ? document.getElementById('current-region-display').innerText = state.currentRegion.title : null;
+      document.getElementById('region-selector').value = regionId;
       
       initPlannerUI();
+      
+      // 출발지 거점을 해당 도시의 공항(defaultHub)으로 셋팅
+      document.getElementById('input-from').value = state.currentRegion.defaultHub;
+      document.getElementById('input-to').value = "";
+      updateLiveMap(); // 지도 갱신
+      
       changeTab('planner');
     }
 
-    // 설계기 선택 변경 시
     function onRegionSelectorChange(regionId) {
       state.currentRegion = GEOPASS_DB[regionId];
-      state.itinerary = [...state.currentRegion.preset];
+      state.itinerary = [];
+      document.getElementById('input-from').value = state.currentRegion.defaultHub;
+      document.getElementById('input-to').value = "";
       initPlannerUI();
+      updateLiveMap();
     }
 
-    // 코스 원본 복원
     function restorePreset() {
-      state.itinerary = [...state.currentRegion.preset];
+      state.itinerary = [];
+      document.getElementById('input-from').value = state.currentRegion.defaultHub;
+      document.getElementById('input-to').value = "";
       initPlannerUI();
+      updateLiveMap();
     }
 
-    // 일정 전체 삭제
     function clearItineraryList() {
       state.itinerary = [];
       initPlannerUI();
+      updateLiveMap();
     }
 
-    // 플래너 데이터 빌딩
     function initPlannerUI() {
-      document.getElementById('planner-region-name').innerText = state.currentRegion.title.split(" / ")[1].replace("🌿", "").replace("🍊", "").replace("🌸", "").trim();
+      document.getElementById('planner-region-name').innerText = state.currentRegion.title.split(" / ")[1] ? state.currentRegion.title.split(" / ")[1].replace(/[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]/g, "").trim() : state.currentRegion.title.replace(/[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]/g, "").trim();
       document.getElementById('itinerary-size').innerText = state.itinerary.length;
 
-      // 셀렉트 박스 주입
-      const selectFrom = document.getElementById('input-from');
-      const selectTo = document.getElementById('input-to');
-      selectFrom.innerHTML = '';
-      selectTo.innerHTML = '';
-
-      state.currentRegion.hubs.forEach((hub, i) => {
-        const op1 = document.createElement('option');
-        op1.value = hub.nameKo;
-        op1.innerText = hub.nameKo;
-        selectFrom.appendChild(op1);
-
-        const op2 = document.createElement('option');
-        op2.value = hub.nameKo;
-        op2.innerText = hub.nameKo;
-        if (i === 1) op2.selected = true;
-        selectTo.appendChild(op2);
-      });
-
-      // 일정 리스트 카드 바인딩
+      // 일정 리스트 출력
       const container = document.getElementById('itinerary-list');
       container.innerHTML = '';
 
       if (state.itinerary.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-10 text-black text-xs font-bold bg-[#FBF5DD]/20 border border-dashed border-[#E7E1B1] rounded-2xl">
-            🌱 현재 추가된 소도시 경로가 없습니다. 위의 추가창에서 동선을 생성해 주세요.
+          <div class="text-center py-10 text-black text-xs font-bold bg-[#FBF5DD]/25 border border-dashed border-[#E7E1B1] rounded-2xl">
+            🌱 아직 추가된 동선이 없습니다. 명소를 직접 검색하여 구간을 완성해 주세요.
           </div>
         `;
         document.getElementById('btn-analysis-container').classList.add('hidden');
@@ -824,7 +740,7 @@
           if (item.type === 'Walk') emoji = '🚶';
 
           const card = document.createElement('div');
-          card.className = "flex items-center justify-between p-3.5 bg-[#FBF5DD]/40 hover:bg-[#FBF5DD] rounded-xl border border-[#E7E1B1] text-xs text-black transition";
+          card.className = "flex items-center justify-between p-3.5 bg-[#FBF5DD]/30 hover:bg-[#FBF5DD] rounded-xl border border-[#E7E1B1] text-xs text-black transition";
           card.innerHTML = `
             <div class="flex items-center gap-3">
               <span class="w-5 h-5 rounded-full bg-[#E7E1B1] text-[10px] text-black font-black flex items-center justify-center">${index + 1}</span>
@@ -838,104 +754,66 @@
           container.appendChild(card);
         });
       }
-
-      // 와이드 SVG 맵 드로잉
-      drawVirtualSVGMap();
     }
 
-    // 동선 단일 추가
+    // 직접 검색을 통한 구글 맵스 실시간 업데이트 (onblur 이벤트 트리거)
+    function updateLiveMap() {
+      const fromVal = document.getElementById('input-from').value.trim();
+      const toVal = document.getElementById('input-to').value.trim();
+      const iframe = document.getElementById('google-maps-iframe');
+      
+      let baseUrl = "https://maps.google.com/maps?";
+      let safeRegion = encodeURIComponent(state.currentRegion.title.replace(/[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]/g, "").trim());
+
+      if (fromVal && toVal) {
+        // 출발지 도착지 모두 있을 경우 경로 모드로 출력
+        iframe.src = `${baseUrl}saddr=${encodeURIComponent(fromVal)}&daddr=${encodeURIComponent(toVal)}&output=embed`;
+      } else if (fromVal || toVal) {
+        // 하나만 있을 경우 해당 지점 지도
+        let q = (fromVal || toVal) + " " + safeRegion;
+        iframe.src = `${baseUrl}q=${encodeURIComponent(q)}&output=embed`;
+      } else {
+        // 둘 다 없을 경우 해당 도시 기본 지도
+        iframe.src = `${baseUrl}q=${safeRegion}&output=embed`;
+      }
+    }
+
+    // 구간 등록 추가
     function addSegmentToItinerary() {
-      const fromVal = document.getElementById('input-from').value;
-      const toVal = document.getElementById('input-to').value;
+      const fromVal = document.getElementById('input-from').value.trim();
+      const toVal = document.getElementById('input-to').value.trim();
       const typeVal = document.getElementById('input-type').value;
 
+      if (!fromVal || !toVal) {
+        alert("출발지와 목적지를 모두 입력해 주세요.");
+        return;
+      }
+
       if (fromVal === toVal) {
-        alert("출발지와 목적지는 중복될 수 없습니다.");
+        alert("출발지와 도착지는 같을 수 없습니다.");
         return;
       }
 
       state.itinerary.push({ from: fromVal, to: toVal, type: typeVal });
+      
+      // 편의성을 위해 다음 출발지를 이번 도착지로 자동 설정
+      document.getElementById('input-from').value = toVal;
+      document.getElementById('input-to').value = "";
+      
       initPlannerUI();
+      updateLiveMap(); // 지도 갱신
     }
 
-    // 동선 제거
     function removeSegment(index) {
       state.itinerary.splice(index, 1);
       initPlannerUI();
     }
 
-    // 가상 SVG 맵 렌더러
-    function drawVirtualSVGMap() {
-      const svg = document.getElementById('svg-map');
-      const labelContainer = document.getElementById('map-labels-container');
-      svg.innerHTML = '';
-      labelContainer.innerHTML = '';
-
-      // 격자 선
-      svg.innerHTML += `
-        <defs>
-          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#306D29" stroke-width="0.3" opacity="0.2" />
-          </pattern>
-        </defs>
-        <rect width="100" height="100" fill="url(#grid)" />
-      `;
-
-      // 1. 등록 일정 패키지 연결선
-      state.itinerary.forEach((seg) => {
-        const fromHub = state.currentRegion.hubs.find(h => h.nameKo === seg.from);
-        const toHub = state.currentRegion.hubs.find(h => h.nameKo === seg.to);
-        if (fromHub && toHub) {
-          let color = '#E7E1B1'; 
-          let dash = '0';
-          if (seg.type === 'Walk') {
-            color = '#FFFFFF';
-            dash = '1.5,1.5';
-          } else if (seg.type === 'Ferry') {
-            color = '#FFFFFF';
-            dash = '3,3';
-          } else if (seg.type === 'Bus') {
-            color = '#306D29';
-          } else if (seg.type === 'Train') {
-            color = '#FFFFFF';
-          }
-
-          svg.innerHTML += `
-            <line x1="${fromHub.x}" y1="${fromHub.y}" x2="${toHub.x}" y2="${toHub.y}" 
-              stroke="${color}" stroke-width="1.3" stroke-dasharray="${dash}" />
-            <circle cx="${(fromHub.x+toHub.x)/2}" cy="${(fromHub.y+toHub.y)/2}" r="1" fill="#FBF5DD" class="pulse-marker" />
-          `;
-        }
-      });
-
-      // 2. 주요 거점 마커 생성
-      state.currentRegion.hubs.forEach((hub) => {
-        const isIncluded = state.itinerary.some(it => it.from === hub.nameKo || it.to === hub.nameKo);
-        const markerColor = isIncluded ? '#FFFFFF' : '#306D29';
-        const rad = isIncluded ? '2.5' : '1.5';
-
-        svg.innerHTML += `
-          <circle cx="${hub.x}" cy="${hub.y}" r="${rad}" fill="${markerColor}" />
-          ${isIncluded ? `<circle cx="${hub.x}" cy="${hub.y}" r="4.5" fill="none" stroke="#E7E1B1" stroke-width="0.3" opacity="0.8" class="animate-ping" />` : ''}
-        `;
-
-        // 라벨 생성
-        const lbl = document.createElement('div');
-        lbl.style.left = `${hub.x}%`;
-        lbl.style.top = `${hub.y}%`;
-        lbl.className = `absolute -translate-x-1/2 -translate-y-5 px-2 py-0.5 rounded-md text-[7px] font-bold whitespace-nowrap pointer-events-none transition ${
-          isIncluded 
-            ? 'bg-[#FBF5DD] text-black font-black border border-[#E7E1B1] shadow-xs' 
-            : 'bg-[#0D530E] text-white opacity-60'
-        }`;
-        lbl.innerText = hub.nameKo;
-        labelContainer.appendChild(lbl);
-      });
-    }
-
-    // AI 계산기 로더 기동
+    // ==========================================
+    // 계산기 로더 및 결과 정산 페이지 이동
+    // ==========================================
     function runAnalysis() {
-      const modal = document.getElementById('ai-loading-modal');
+      const modal = document.getElementById('loading-modal');
       const bar = document.getElementById('loading-bar-inner');
       const text = document.getElementById('loading-status');
       const percent = document.getElementById('loading-percent');
@@ -945,12 +823,12 @@
       let step = 10;
       bar.style.width = '10%';
       percent.innerText = '10%';
-      text.innerText = '실시간 노선별 기본 단가 매칭 중...';
+      text.innerText = '선택 구간 대중교통 운임 매칭 중...';
 
       const statuses = [
-        "선택 패키지 교통패스 손익 구간 검증 중...",
-        "비적용 구역 버스/페리 요금 가산 필터 가동 중...",
-        "최종 AI 교통 정산 최적 패키지 분석 완료!"
+        "패키지 교통패스 손익 분기 검증 중...",
+        "비적용 구역 요금 합산 중...",
+        "최적의 정산서 도출 완료!"
       ];
 
       const interval = setInterval(() => {
@@ -964,7 +842,7 @@
             text.innerText = statuses[1];
           }
         }
-      }, 150);
+      }, 120);
 
       setTimeout(() => {
         clearInterval(interval);
@@ -977,12 +855,12 @@
           processFares();
           document.getElementById('nav-btn-result').classList.remove('hidden');
           changeTab('result');
-        }, 400);
+        }, 300);
 
-      }, 1800);
+      }, 1600);
     }
 
-    // 요금 분기 분석 연산
+    // 요금 시뮬레이션 상세 연산 및 결과 매핑
     function processFares() {
       const activePass = state.currentRegion.passes[0];
       let icTotal = 0;
@@ -994,16 +872,12 @@
 
         if (item.type === 'Bus') {
           fare = 450;
-          isCovered = false;
+          isCovered = false; // 일반적인 패스는 로컬 버스 제외 경우가 많음
         } else if (item.type === 'Ferry') {
           fare = 700;
-          isCovered = state.currentRegion.id === 'takamatsu';
+          isCovered = state.currentRegion.id === 'takamatsu' || state.currentRegion.id === 'hiroshima' || state.currentRegion.id === 'kitakyushu';
         } else if (item.type === 'Train') {
-          if (item.to.includes('고토히라') || item.to.includes('우치코') || item.to.includes('도야마')) {
-            fare = 860;
-          } else {
-            fare = 320;
-          }
+          fare = 350;
         } else if (item.type === 'Walk') {
           fare = 0;
         }
@@ -1032,21 +906,21 @@
 
       if (savings > 0) {
         mainTitle.innerText = "교통패스를 준비해 가시는 게 압도적으로 저렴합니다!";
-        subTitle.innerText = `추천 대안 솔루션: [${activePass.name}]`;
+        subTitle.innerText = `추천 패키지: [${activePass.name}]`;
         savingsDisp.innerText = `+ ¥${savings.toLocaleString()}`;
-        ribbon.className = "p-8 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-6 bg-gradient-to-r from-[#0D530E] to-[#306D29] shadow-emerald-500/10";
+        ribbon.className = "p-6 rounded-2xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-4 bg-gradient-to-r from-[#0D530E] to-[#306D29] shadow-emerald-500/10";
       } else {
-        mainTitle.innerText = "패스보단 일반 교통카드(IC) 충전 정산이 훨씬 유리합니다!";
-        subTitle.innerText = "분석 소결: 이동 빈도수 대비 패키지 가격이 높게 나타납니다.";
+        mainTitle.innerText = "개별 충전형 IC카드가 훨씬 경제적이에요!";
+        subTitle.innerText = "분석 소결: 이동 구간 요금 총합이 패스 가격보다 낮게 나타납니다.";
         savingsDisp.innerText = `¥0`;
-        ribbon.className = "p-8 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-6 bg-gradient-to-r from-slate-800 to-slate-700 shadow-slate-800/10";
+        ribbon.className = "p-6 rounded-2xl text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-4 bg-gradient-to-r from-slate-800 to-slate-700 shadow-slate-800/10";
       }
 
-      // 지표 바 차트 데이터 갱신
+      // 지표 바 갱신
       document.getElementById('ic-price-total').innerText = `¥${icTotal.toLocaleString()}`;
       document.getElementById('pass-price-total').innerText = `¥${passTotal.toLocaleString()}`;
 
-      const maxVal = Math.max(icTotal, passTotal);
+      const maxVal = Math.max(icTotal, passTotal) || 1;
       document.getElementById('bar-ic-price').style.width = `${(icTotal / maxVal) * 100}%`;
       document.getElementById('bar-pass-price').style.width = `${(passTotal / maxVal) * 100}%`;
 
@@ -1055,27 +929,43 @@
       document.getElementById('detail-extra-price').innerText = `+ ¥${extraCosts.toLocaleString()}`;
       document.getElementById('detail-total-price').innerText = `¥${passTotal.toLocaleString()}`;
 
-      // 맞춤형 가이드 텍스트
+      // 지역별 탑승 가이드
       let adviceText = "";
       if (state.currentRegion.id === 'takamatsu') {
-        adviceText = "다카마쓰 우동 투어 노선이나 쇼도섬 페리는 본 시코쿠 레일패스로 100% 무상 통과가 지원됩니다. 단, 공항에서 출발하는 노선 리무진은 개찰구 승강 전, 공항 카운터에서 실물 예약 표로 사전에 발권하셔야 무료 승차가 안정적으로 적용됩니다.";
+        adviceText = "다카마쓰 쇼도섬 페리는 시코쿠 레일패스로 무상 통과가 지원됩니다. 공항 리무진은 실물 승차권 교환 후 탑승하시길 권장드립니다.";
       } else if (state.currentRegion.id === 'matsuyama') {
-        adviceText = "마쓰야마 봇짱 전차는 해당 에리어 패스 사용 범위에서 제외되므로 1회 탑승 시 추가 부담 요금이 부과될 수 있습니다. 일반 노면 전차는 하차 승무원 스캔만으로 완벽 프리패스 무제한 탑승이 보장됩니다.";
+        adviceText = "봇짱 열차는 탑승 전 별도의 예약 및 추가 요금이 부과될 수 있습니다. 일반 노면 전차는 하차 시 승무원 확인만으로 무제한 탑승이 가능합니다.";
+      } else if (state.currentRegion.id === 'hiroshima') {
+        adviceText = "미야지마 페리는 패키지에 포함되나, 섬 입도세인 100엔은 현지에서 별도로 징수될 수 있으니 잔돈을 준비해 주세요.";
       } else {
-        adviceText = "호쿠리쿠 가나자와 신칸센(특급 자유석) 게이트는 본 호쿠리쿠 패스 스루 통과가 지원됩니다. 다만, 미술관 인근 셔틀 버스 중 일부 민간 노선은 패스 미적용 유료 구역이니 탑승 전 꼭 후면 가이드를 참고하세요.";
+        adviceText = "선택하신 노선의 일부 민간 사철 및 로컬 버스는 패스 호환이 불가능할 수 있으므로, 탑승 전 후면의 적용 마크를 꼭 확인하세요.";
       }
-      document.getElementById('ai-report-box').innerText = adviceText;
+      document.getElementById('local-guide-box').innerText = adviceText;
 
-      // 구간 요금표 빌드 (검은색 텍스트화 보장)
+      // 동선 리스트에서 구글 맵스 멀티 라우팅 구현
+      const resultMapIframe = document.getElementById('result-google-maps-iframe');
+      if (state.itinerary.length > 0) {
+        const startPoint = encodeURIComponent(state.itinerary[0].from);
+        const waypoints = state.itinerary.map(item => encodeURIComponent(item.to)).join('+to:');
+        resultMapIframe.src = `https://maps.google.com/maps?saddr=${startPoint}&daddr=${waypoints}&output=embed`;
+      }
+
+      // Klook 제휴 링크 각 도시별 동적 연동
+      const klookBtn = document.getElementById('btn-klook-link');
+      if(state.currentRegion.klookUrl) {
+         klookBtn.href = state.currentRegion.klookUrl;
+      }
+
+      // 영수증 리스트에 각 동선당 소비 비용 상세 바인딩
       const container = document.getElementById('receipt-segments-list');
       container.innerHTML = '';
 
       segments.forEach((seg, idx) => {
-        let typeText = '🚃 일반 열차 전차';
-        if (seg.type === 'Bus') typeText = '🚌 시외/시내 버스 노선';
-        if (seg.type === 'Tram') typeText = '🚋 낭만 노면 전차';
-        if (seg.type === 'Ferry') typeText = '🚢 고속 페리 여객선';
-        if (seg.type === 'Walk') typeText = '🚶 도보 풍경 걷기';
+        let typeText = '🚃 열차 / 지하철';
+        if (seg.type === 'Bus') typeText = '🚌 버스 / 코치';
+        if (seg.type === 'Tram') typeText = '🚋 노면 전차';
+        if (seg.type === 'Ferry') typeText = '🚢 고속 페리';
+        if (seg.type === 'Walk') typeText = '🚶 도보 길목 걷기';
 
         const row = document.createElement('div');
         row.className = "p-3 border border-[#E7E1B1] rounded-xl text-xs space-y-1 bg-[#FBF5DD]/20 hover:bg-[#FBF5DD]/50 transition text-black";
@@ -1083,12 +973,12 @@
           <div class="flex justify-between items-center text-[10px] text-black">
             <span class="font-bold text-black">구간 ${idx+1}</span>
             <span class="font-black ${seg.isCovered ? 'text-[#0D530E]' : 'text-rose-600'}">
-              ${seg.isCovered ? '패스 무제한 커버' : '현장 개별 지불'}
+              ${seg.isCovered ? '패스 탑승 지원' : '별도 지불 발생'}
             </span>
           </div>
           <div class="flex justify-between font-black text-black">
             <span>${seg.from} ➔ ${seg.to}</span>
-            <span>¥${seg.fare.toLocaleString()}</span>
+            <span class="text-sm">¥${seg.fare.toLocaleString()}</span>
           </div>
           <p class="text-[9px] text-black font-semibold">${typeText}</p>
         `;
@@ -1096,41 +986,6 @@
       });
     }
 
-    // 저장 히스토리 렌더링 (와이드 카드 양식)
-    function renderSavedPlans() {
-      const container = document.getElementById('saved-list');
-      container.innerHTML = '';
-
-      state.savedPlans.forEach((plan) => {
-        const item = document.createElement('div');
-        item.className = "p-5 bg-[#FBF5DD] border border-[#E7E1B1] rounded-2xl hover:border-[#0D530E] transition space-y-3 cursor-pointer text-black";
-        item.innerHTML = `
-          <div class="flex justify-between items-center">
-            <span class="text-sm font-black text-black">${plan.title}</span>
-            <span class="text-xs bg-white text-[#0D530E] border border-[#E7E1B1] px-3 py-0.5 rounded-full font-black">절약: ${plan.savings}</span>
-          </div>
-          <div class="flex justify-between text-xs text-black font-semibold">
-            <span>설정 거점: 4곳</span>
-            <span>패스 최종 비용액: <span class="font-black text-black">${plan.cost}</span></span>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    // 공유하기 토스트
-    function shareItinerary() {
-      alert("플래너 동선 요금 분석서가 클립보드에 복사되었습니다! 여행 메이트에게 벚꽃길 동선을 전송해 보세요. 🌱");
-    }
-
-    // 가상 모달 가이드
-    function openRegionSelectorModal() {
-      alert("다카마쓰, 마쓰야마, 가나자와 중 원하시는 메인 소도시를 홈화면 그리드에서 골라주시면 실시간 패키지 정산이 가능합니다!");
-    }
-
-    function gpsReset() {
-      alert("현재 계획 중인 일본 동선 루트 요금이 기준지로 정상 리로드되었습니다. 🌱");
-    }
   </script>
 </body>
 </html>
